@@ -385,6 +385,9 @@
       /* The arrows above the songs, not over them */
       :root { --arrow-top: 46%; }
 
+      /* Title, kind and year on one line */
+      .eyebrow { letter-spacing: .12em; }
+
       body {
         justify-content: flex-start;
         padding-top: max(110px, 14vh);
@@ -444,7 +447,7 @@
     }
 
     @media (prefers-reduced-motion: no-preference) {
-      .sky { animation: skyIn 3.8s ease-in-out both; }
+      .sky { animation: skyIn 3.8s linear both; }
       .sky img { animation: spin 50s linear infinite; }
       .mask-container img.universe { animation-name: fadeIn, rotateAndScale; animation-duration: 1.8s, 100s; animation-delay: 1.8s, 0s; animation-fill-mode: both, none; animation-timing-function: ease-in-out, linear; animation-iteration-count: 1, infinite; }
       body::before { animation: fadeIn 1.6s 3.2s ease both; }
@@ -464,9 +467,10 @@
       .mask-container img.universe { animation-duration: 1.8s, 200s; }
     }
 
+    /* The sky comes up quickly, then starts fading at once, across the rest of the entrance */
     @keyframes skyIn {
-      0% { opacity: 0; visibility: visible; transform: scale(1.12); }
-      35%, 55% { opacity: 1; }
+      0% { opacity: 0; visibility: visible; transform: scale(1.12); animation-timing-function: ease-out; }
+      12% { opacity: 1; transform: scale(1.105); animation-timing-function: cubic-bezier(.3, .1, .5, 1); }
       100% { opacity: 0; visibility: hidden; transform: scale(1); }
     }
 
@@ -495,7 +499,7 @@
     </div>
   </div>
   <div class="info">
-    <p class="eyebrow">The Universe Is Ours EP</p>
+    <p class="eyebrow">The Universe Is Ours EP · 2024</p>
     <ol class="tracks">
       <li><button type="button" data-track="0"><span>1</span>Brutal Future</button></li>
       <li><button type="button" data-track="1"><span>2</span>Ghost Parasite</button></li>
@@ -545,6 +549,8 @@
   </div>
   <script src="player.js"></script>
   <script src="nav.js"></script>
+  <script src="cursor.js"></script>
+  <script>BTD.cursor('star');</script>
   <script>
     (function () {
       var music = BTD.createPlayer({

@@ -83,7 +83,7 @@
       aspect-ratio: 1.3;
       transform: translate(-50%, -50%);
       background:
-        radial-gradient(closest-side, rgba(255, 252, 225, .42), rgba(232, 236, 190, .16) 35%, rgba(150, 200, 110, .06) 60%, transparent);
+        radial-gradient(closest-side, rgba(255, 252, 225, .58), rgba(232, 236, 190, .24) 35%, rgba(150, 200, 110, .08) 60%, transparent);
       mix-blend-mode: screen;
       pointer-events: none;
     }
@@ -548,14 +548,14 @@
     /* Light through leaves: uneven, never quite still */
     @keyframes flicker {
       0%, 100% { opacity: 1; }
-      12% { opacity: .82; }
-      19% { opacity: .95; }
-      33% { opacity: .78; }
+      12% { opacity: .6; }
+      19% { opacity: .9; }
+      33% { opacity: .5; }
       41% { opacity: 1; }
-      58% { opacity: .86; }
-      64% { opacity: .97; }
-      79% { opacity: .8; }
-      88% { opacity: .93; }
+      58% { opacity: .66; }
+      64% { opacity: .94; }
+      79% { opacity: .55; }
+      88% { opacity: .85; }
     }
 
     @keyframes letter {
@@ -669,7 +669,7 @@
   </h1>
 
   <div class="info">
-    <p class="eyebrow">The Wendt</p>
+    <p class="eyebrow">The Wendt · 2026</p>
     <ol class="tracks">
       <li><button type="button" data-track="0"><span>I</span>Masmusa</button></li>
       <li><button type="button" data-track="1"><span>II</span>Pangsaging</button></li>
@@ -736,6 +736,8 @@
 
   <script src="player.js"></script>
   <script src="nav.js"></script>
+  <script src="cursor.js"></script>
+  <script>BTD.cursor('mote');</script>
   <script>
     (function () {
       var root = document.documentElement;

@@ -12,7 +12,7 @@
   <script>try { var a = sessionStorage.getItem('btd-arrive'); if (a) { sessionStorage.removeItem('btd-arrive'); document.documentElement.dataset.arrive = a; } } catch (e) {}</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100,400;125,900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #0c0c0e;
@@ -126,8 +126,8 @@
 
     .title {
       font-size: clamp(15px, 1.25vw, 16px);
-      font-weight: 900;
-      font-stretch: 125%;
+      font-weight: 600;
+      font-stretch: 112%;
       letter-spacing: .02em;
       text-transform: uppercase;
       line-height: 1.2;
@@ -223,25 +223,25 @@
     <li class="release" style="--i: 0">
       <a href="./">
         <span class="cover"><img src="wendt/cover-sm.webp" alt="" width="600" height="600"></span>
-        <span class="meta"><span class="title">The Wendt</span></span>
+        <span class="meta"><span class="title">The Wendt</span><span class="kind">LP · 2026</span></span>
       </a>
     </li>
     <li class="release" style="--i: 1">
       <a href="ensete">
         <span class="cover"><img src="ensete/cover-sm.webp" alt="" width="600" height="600"></span>
-        <span class="meta"><span class="title">Ensete</span><span class="kind">Single</span></span>
+        <span class="meta"><span class="title">Ensete</span><span class="kind">Single · 2025</span></span>
       </a>
     </li>
     <li class="release" style="--i: 2">
       <a href="the-universe-is-ours">
         <span class="cover cover-universe"></span>
-        <span class="meta"><span class="title">The Universe Is Ours</span><span class="kind">EP</span></span>
+        <span class="meta"><span class="title">The Universe Is Ours</span><span class="kind">EP · 2024</span></span>
       </a>
     </li>
     <li class="release" style="--i: 3">
       <a href="the-big-sleep">
         <span class="cover"><img src="the-big-sleep/cover-sm.webp" alt="" width="600" height="600"></span>
-        <span class="meta"><span class="title">The Big Sleep</span><span class="kind">Album</span></span>
+        <span class="meta"><span class="title">The Big Sleep</span><span class="kind">LP · 2005</span></span>
       </a>
     </li>
     <li class="release" style="--i: 4">
@@ -258,6 +258,8 @@
 
   <div class="veil" aria-hidden="true"></div>
 
+  <script src="cursor.js"></script>
+  <script>BTD.cursor('ring');</script>
   <script>
     (function () {
       var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

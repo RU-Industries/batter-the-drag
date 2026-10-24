@@ -760,7 +760,7 @@
     </div>
 
     <div class="info">
-      <p class="eyebrow">Unfathomable Depths EP</p>
+      <p class="eyebrow">Unfathomable Depths EP · 2004</p>
       <ol class="tracks">
         <li><button type="button" data-track="0"><span>1</span>Bezel</button></li>
         <li><button type="button" data-track="1"><span>2</span>Firewater Allergy</button></li>
@@ -818,6 +818,8 @@
 
   <script src="player.js"></script>
   <script src="nav.js"></script>
+  <script src="cursor.js"></script>
+  <script>BTD.cursor('ink');</script>
   <script>
     (function () {
       var root = document.documentElement;
@@ -994,15 +996,32 @@
         kick();
       }
 
-      // Click/tap the open page to flick ink at it.
-      document.addEventListener('pointerdown', function (e) {
-        if (e.button !== 0 || e.target.closest('a, button, .info, .player, .stage')) return;
-        if (!isClear(e.clientX, e.clientY, 12, blockers())) return;
+      // Click/tap the open page to flick ink at it; drag with the mouse held down to keep flicking.
+      function flick(x, y) {
+        if (!isClear(x, y, 12, blockers().concat(stage.getBoundingClientRect()))) return;
         var R = (window.innerWidth < 700 ? 8 : 12) + Math.random() * 20;
-        splats.push(makeSplat(e.clientX, e.clientY, R, pick(INKS), 0));
+        splats.push(makeSplat(x, y, R, pick(INKS), 0));
         if (splats.length > 60) splats.shift();
         kick();
+      }
+      var flicking = false, flickTravel = 0, lastFlick;
+      document.addEventListener('pointerdown', function (e) {
+        if (e.button !== 0 || e.target.closest('a, button, .info, .player, .stage')) return;
+        flick(e.clientX, e.clientY);
+        flicking = e.pointerType === 'mouse';
+        flickTravel = 0;
+        lastFlick = { x: e.clientX, y: e.clientY };
       });
+      document.addEventListener('pointermove', function (e) {
+        if (!flicking) return;
+        if (!(e.buttons & 1)) { flicking = false; return; }
+        flickTravel += Math.hypot(e.clientX - lastFlick.x, e.clientY - lastFlick.y);
+        lastFlick = { x: e.clientX, y: e.clientY };
+        if (flickTravel < 70) return;
+        flickTravel = 0;
+        flick(e.clientX, e.clientY);
+      });
+      document.addEventListener('pointerup', function () { flicking = false; });
 
       // ---------- Sound ----------
       var music = BTD.createPlayer({

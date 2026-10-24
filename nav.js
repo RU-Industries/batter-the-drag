@@ -18,7 +18,6 @@
     function go(link, dir) {
       if (!link || leaving || (opts.canLeave && !opts.canLeave())) return;
       leaving = true;
-      if (dir === 'next') BTD.store('btd-used-next', '1');
       if (reduceMotion) { location.href = link.href; return; }
       var ms = opts.leave(link, dir);
       timer = setTimeout(function () { location.href = link.href; }, ms);
@@ -60,11 +59,12 @@
     });
 
     // ---------- Hint: a streak shoots across the screen into the next arrow ----------
-    // So nobody misses it. Skipped once the visitor has used, hovered or focused a next arrow.
-    var HINT_GAP = 15000; // play once more if they're still here this long after
+    // On every page, so nobody misses it. Stops once the visitor hovers or focuses this page's next arrow.
+    var HINT_GAP = 12000; // play once more if they're still here this long after
     var hintTimer;
+    var noticed = false;
 
-    function engaged() { BTD.store('btd-used-next', '1'); }
+    function engaged() { noticed = true; clearTimeout(hintTimer); }
     if (opts.next) {
       opts.next.addEventListener('pointerenter', engaged);
       opts.next.addEventListener('focus', engaged);
@@ -72,7 +72,7 @@
 
     function streak(again) {
       var next = opts.next;
-      if (leaving || BTD.recall('btd-used-next')) return;
+      if (leaving || noticed) return;
       // Don't waste it on a background tab; play it when they come back.
       if (document.hidden) {
         document.addEventListener('visibilitychange', function () { streak(again); }, { once: true });
