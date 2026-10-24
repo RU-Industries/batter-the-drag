@@ -826,6 +826,7 @@
       var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       var page = document.querySelector('.page');
       var stage = document.querySelector('.stage');
+      var record = document.querySelector('.record');
 
       // Title letters get stamped on one at a time, each a little crooked.
       var n = 0;
@@ -998,7 +999,8 @@
 
       // Click/tap the open page to flick ink at it; drag with the mouse held down to keep flicking.
       function flick(x, y) {
-        if (!isClear(x, y, 12, blockers().concat(stage.getBoundingClientRect()))) return;
+        // (and off the cover and the record sticking out of it, which sit above the ink)
+        if (!isClear(x, y, 12, blockers().concat(stage.getBoundingClientRect(), record.getBoundingClientRect()))) return;
         var R = (window.innerWidth < 700 ? 8 : 12) + Math.random() * 20;
         splats.push(makeSplat(x, y, R, pick(INKS), 0));
         if (splats.length > 60) splats.shift();

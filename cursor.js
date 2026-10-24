@@ -1,7 +1,9 @@
 // Each page's own cursor: a drawn head that follows the mouse and a trail of particles
 // behind it, in the page's look. Call BTD.cursor('<kind>') once; kinds are below.
-// Mouse and trackpad only: touch, pen and reduced motion keep the normal cursor, and so
-// does a page whose script never runs (the system cursor is hidden only once ours draws).
+// The head is for a mouse or trackpad: pen and touch keep the normal cursor, and so does a
+// page whose script never runs (the system cursor is hidden only once ours draws). Touch
+// still gets the effects: a tap bursts, and a finger trails and sprays as it scrolls.
+// Reduced motion gets none of it.
 (function () {
   function rand(a, b) { return a + Math.random() * (b - a); }
   function pick(list) { return list[Math.floor(Math.random() * list.length)]; }
@@ -366,8 +368,7 @@
   var BTD = window.BTD || (window.BTD = {});
   BTD.cursor = function (name) {
     var kind = KINDS[name];
-    if (!kind || !window.matchMedia('(hover: hover) and (pointer: fine)').matches ||
-        window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!kind || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     var canvas = document.createElement('canvas');
     canvas.setAttribute('aria-hidden', 'true');
@@ -409,7 +410,33 @@
       add(kind.burst(sx, sy).filter(function (p, i) { return i === 0 || Math.random() < .3; }));
     }
 
-    function run() { if (!frame) { last = performance.now(); frame = requestAnimationFrame(tick); } }
+    function run() {
+      if (!canvas.isConnected) document.body.appendChild(canvas);
+      if (!frame) { last = performance.now(); frame = requestAnimationFrame(tick); }
+    }
+
+    // A move from (fx, fy) to (tx, ty): the trail laid evenly along it, however far it went
+    // this frame, and while spraying, part of the click effect every DRAG_EVERY px
+    function stroke(fx, fy, tx, ty, spraying) {
+      var dx = tx - fx, dy = ty - fy;
+      var dist = Math.hypot(dx, dy);
+      travel += dist;
+      var n = Math.floor(travel / kind.every), step = kind.every;
+      if (n > 12) { n = 12; step = travel / n; } // a fast flick: fewer, wider-spaced
+      for (var i = 1; i <= n; i++) {
+        var s = 1 - (travel - i * step) / Math.max(dist, 1);
+        add([kind.spawn(fx + dx * s, fy + dy * s, dx / Math.max(1, n), dy / Math.max(1, n))]);
+      }
+      if (n) travel -= n * step;
+      if (!spraying) return;
+      dragTravel += dist;
+      for (var j = 1; dragTravel >= DRAG_EVERY && j <= 6; j++) {
+        dragTravel -= DRAG_EVERY;
+        var f = 1 - dragTravel / Math.max(dist, 1);
+        spray(fx + dx * f, fy + dy * f);
+      }
+      dragTravel %= DRAG_EVERY;
+    }
 
     function tick(now) {
       var dt = Math.min(.05, (now - last) / 1000);
@@ -439,32 +466,12 @@
       if (e.pointerType !== 'mouse') return;
       if (!shown) {
         shown = true;
-        if (!canvas.isConnected) document.body.appendChild(canvas);
         document.documentElement.classList.add('has-cursor');
         x = e.clientX;
         y = e.clientY;
       }
-      var dx = e.clientX - x, dy = e.clientY - y;
-      var dist = Math.hypot(dx, dy);
-      // Lay the trail evenly along the move, however far it went this frame
-      travel += dist;
-      var n = Math.floor(travel / kind.every), step = kind.every;
-      if (n > 12) { n = 12; step = travel / n; } // a fast flick: fewer, wider-spaced
-      for (var i = 1; i <= n; i++) {
-        var s = 1 - (travel - i * step) / Math.max(dist, 1);
-        add([kind.spawn(x + dx * s, y + dy * s, dx / Math.max(1, n), dy / Math.max(1, n))]);
-      }
-      if (n) travel -= n * step;
       if (down && !(e.buttons & 1)) release(); // let go outside the window
-      if (down) {
-        dragTravel += dist;
-        for (var j = 1; dragTravel >= DRAG_EVERY && j <= 6; j++) {
-          dragTravel -= DRAG_EVERY;
-          var f = 1 - dragTravel / Math.max(dist, 1);
-          spray(x + dx * f, y + dy * f);
-        }
-        dragTravel %= DRAG_EVERY;
-      }
+      stroke(x, y, e.clientX, e.clientY, down);
       x = e.clientX;
       y = e.clientY;
       hot = !!(e.target.closest && e.target.closest(HOT));
@@ -500,5 +507,29 @@
     }
     window.addEventListener('pointerdown', handBack);
     window.addEventListener('pointermove', handBack, { passive: true });
+
+    // Touch: the finger trails and sprays as it goes, scrolling as normal (touch events keep
+    // coming while the page scrolls, where pointer events stop), and a tap bursts like a click
+    var finger = null;
+    window.addEventListener('touchstart', function (e) {
+      if (e.touches.length !== 1) { finger = null; return; } // a pinch or two-finger scroll
+      var t = e.touches[0];
+      finger = { id: t.identifier, x: t.clientX, y: t.clientY, moved: 0 };
+      travel = dragTravel = 0;
+    }, { passive: true });
+    window.addEventListener('touchmove', function (e) {
+      var t = finger && e.touches.length === 1 && e.touches[0];
+      if (!t || t.identifier !== finger.id) return;
+      finger.moved += Math.hypot(t.clientX - finger.x, t.clientY - finger.y);
+      stroke(finger.x, finger.y, t.clientX, t.clientY, true);
+      finger.x = t.clientX;
+      finger.y = t.clientY;
+      run();
+    }, { passive: true });
+    window.addEventListener('touchend', function () {
+      if (finger && finger.moved < 10) { add(kind.burst(finger.x, finger.y)); run(); }
+      finger = null;
+    }, { passive: true });
+    window.addEventListener('touchcancel', function () { finger = null; }, { passive: true });
   };
 })();
