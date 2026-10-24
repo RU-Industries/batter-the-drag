@@ -19,6 +19,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <script>document.documentElement.classList.replace('no-js', 'js');</script>
   <script>try { var a = sessionStorage.getItem('btd-arrive'); if (a) { sessionStorage.removeItem('btd-arrive'); document.documentElement.dataset.arrive = a; } } catch (e) {}</script>
+  <script src="timing.js"></script>
   <link rel="stylesheet" href="arrows.css">
   <style>
     :root {
@@ -1019,7 +1020,7 @@
         spawning = true;
         initEmbers(false);
         burstEmbers();
-        tween('ignite', 1, 1700, 100, easeInOut);
+        tween('ignite', 1, 1700 / BTD.timing.enter, 100 / BTD.timing.enter, easeInOut);
       }
 
       function light() {
@@ -1047,7 +1048,7 @@
           music.leave(1300);
           spawning = false;
           burstEmbers();
-          tween('ignite', 0, 1150, 0, easeInOut);
+          tween('ignite', 0, 1150 / BTD.timing.exit, 0, easeInOut);
           document.body.classList.add('is-leaving');
           return 1400;
         },

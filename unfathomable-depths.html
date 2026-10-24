@@ -19,6 +19,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;600&family=Big+Shoulders+Stencil:wght@700;900&display=swap" rel="stylesheet">
   <script>document.documentElement.classList.replace('no-js', 'js');</script>
   <script>try { var a = sessionStorage.getItem('btd-arrive'); if (a) { sessionStorage.removeItem('btd-arrive'); document.documentElement.dataset.arrive = a; } } catch (e) {}</script>
+  <script src="timing.js"></script>
   <link rel="stylesheet" href="arrows.css">
   <style>
     :root {
@@ -997,7 +998,7 @@
         kick();
       }
 
-      // Click/tap the open page to flick ink at it; drag with the mouse held down to keep flicking.
+      // Click/tap the open page to flick ink at it; drag (mouse held down, or a finger) to keep flicking.
       function flick(x, y) {
         // (and off the cover and the record sticking out of it, which sit above the ink)
         if (!isClear(x, y, 12, blockers().concat(stage.getBoundingClientRect(), record.getBoundingClientRect()))) return;
@@ -1010,20 +1011,30 @@
       document.addEventListener('pointerdown', function (e) {
         if (e.button !== 0 || e.target.closest('a, button, .info, .player, .stage')) return;
         flick(e.clientX, e.clientY);
-        flicking = e.pointerType === 'mouse';
+        flicking = true;
         flickTravel = 0;
         lastFlick = { x: e.clientX, y: e.clientY };
       });
-      document.addEventListener('pointermove', function (e) {
-        if (!flicking) return;
-        if (!(e.buttons & 1)) { flicking = false; return; }
-        flickTravel += Math.hypot(e.clientX - lastFlick.x, e.clientY - lastFlick.y);
-        lastFlick = { x: e.clientX, y: e.clientY };
+      function dragTo(x, y) {
+        flickTravel += Math.hypot(x - lastFlick.x, y - lastFlick.y);
+        lastFlick = { x: x, y: y };
         if (flickTravel < 70) return;
         flickTravel = 0;
-        flick(e.clientX, e.clientY);
+        flick(x, y);
+      }
+      document.addEventListener('pointermove', function (e) {
+        if (!flicking || e.pointerType !== 'mouse') return;
+        if (!(e.buttons & 1)) { flicking = false; return; }
+        dragTo(e.clientX, e.clientY);
       });
+      // A finger: touch events, which keep coming once the browser takes the gesture and
+      // pointer events stop
+      document.addEventListener('touchmove', function (e) {
+        if (flicking && e.touches.length === 1) dragTo(e.touches[0].clientX, e.touches[0].clientY);
+      }, { passive: true });
       document.addEventListener('pointerup', function () { flicking = false; });
+      document.addEventListener('touchend', function () { flicking = false; });
+      document.addEventListener('touchcancel', function () { flicking = false; });
 
       // ---------- Sound ----------
       var music = BTD.createPlayer({
@@ -1095,7 +1106,7 @@
         setTimeout(function () {
           page.classList.add('is-hit');
           seed(true);
-        }, 1400);
+        }, 1400 / BTD.timing.enter);
         page.addEventListener('animationend', function (e) {
           if (e.target === page) page.classList.remove('is-hit');
         });

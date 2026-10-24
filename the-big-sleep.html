@@ -19,6 +19,7 @@
   <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
   <script>document.documentElement.classList.replace('no-js', 'js');</script>
   <script>try { var a = sessionStorage.getItem('btd-arrive'); if (a) { sessionStorage.removeItem('btd-arrive'); document.documentElement.dataset.arrive = a; } } catch (e) {}</script>
+  <script src="timing.js"></script>
   <link rel="stylesheet" href="arrows.css">
   <style>
     :root {
@@ -1223,9 +1224,9 @@
           // Meander: wobble the heading around the way to the target
           var wobble = Math.sin(now * 1.7 + f.seed) * .9 + Math.sin(now * .6 + f.seed * 2) * .5;
           var heading = Math.atan2(dy, dx) + (f.state === 'land' ? wobble * Math.min(1, dist / 160) : wobble);
-          var speed = f.state === 'leave' ? 260 : f.state === 'land' ? Math.min(55, 12 + dist * .9) : 55;
+          var speed = f.state === 'leave' ? 260 * BTD.timing.exit : f.state === 'land' ? Math.min(55, 12 + dist * .9) : 55;
           speed *= f.R / 18;
-          var steer = Math.min(1, dt * (f.state === 'leave' ? 4 : 2.2));
+          var steer = Math.min(1, dt * (f.state === 'leave' ? 4 * BTD.timing.exit : 2.2));
           f.vx += (Math.cos(heading) * speed - f.vx) * steer;
           f.vy += (Math.sin(heading) * speed - f.vy) * steer;
           f.x += f.vx * dt;
@@ -1529,7 +1530,7 @@
         root.classList.add('is-ready');
         nav.hint();
         var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        setTimeout(critters.start, reduce ? 300 : 5200);
+        setTimeout(critters.start, reduce ? 300 : 5200 / BTD.timing.enter);
       }
       var img = new Image();
       img.src = window.matchMedia('(max-width: 699px)').matches ? 'the-big-sleep/art-sm.webp' : 'the-big-sleep/art.webp';

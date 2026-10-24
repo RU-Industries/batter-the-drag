@@ -18,8 +18,9 @@
     function go(link, dir) {
       if (!link || leaving || (opts.canLeave && !opts.canLeave())) return;
       leaving = true;
+      BTD.store('btd-last-dir', dir);
       if (reduceMotion) { location.href = link.href; return; }
-      var ms = opts.leave(link, dir);
+      var ms = opts.leave(link, dir) / BTD.timing.exit;
       timer = setTimeout(function () { location.href = link.href; }, ms);
     }
 
@@ -59,10 +60,12 @@
     });
 
     // ---------- Hint: a streak shoots across the screen into the next arrow ----------
-    // On every page, so nobody misses it. Stops once the visitor hovers or focuses this page's next arrow.
+    // On every page, so nobody misses it. Stops once the visitor hovers or focuses this page's next arrow,
+    // and skipped on a page they came back to with Previous: they've already found the way forward.
     var HINT_GAP = 12000; // play once more if they're still here this long after
     var hintTimer;
-    var noticed = false;
+    var noticed = BTD.recall('btd-last-dir') === 'prev';
+    BTD.store('btd-last-dir', ''); // only for the page it led to, not a later reload or deep link
 
     function engaged() { noticed = true; clearTimeout(hintTimer); }
     if (opts.next) {

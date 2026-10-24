@@ -128,7 +128,7 @@
       leave: function (ms) {
         leaving = true;
         savePosition();
-        if (wantPlaying) fadeTo(0, ms);
+        if (wantPlaying) fadeTo(0, ms / BTD.timing.exit); // in step with the page's exit
       },
       // Back/forward cache restored this page: pick the music back up if it's wanted.
       restore: function (fadeMs) {
@@ -139,5 +139,8 @@
     };
   }
 
-  window.BTD = { store: store, recall: recall, createPlayer: createPlayer };
+  var BTD = window.BTD || (window.BTD = {});
+  BTD.store = store;
+  BTD.recall = recall;
+  BTD.createPlayer = createPlayer;
 })();
