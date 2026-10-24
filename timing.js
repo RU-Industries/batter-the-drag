@@ -5,7 +5,7 @@
 // On a dev host (localhost, 127.0.0.1, Tailscale), Tab opens a panel to try other speeds.
 // Those stay in this browser only; copy the ones you like into SPEED below.
 (function () {
-  var SPEED = { enter: 3, exit: 3 }; // the global setting
+  var SPEED = { enter: 1, exit: 1 }; // the global setting
 
   var KEY = 'btd-timing';
   var dev = /^(localhost|127\.0\.0\.1|\[::1\])$|\.ts\.net$/.test(location.hostname);
