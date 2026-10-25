@@ -64,8 +64,29 @@
       }, function (err) {
         // AbortError just means another track was loaded first; anything else (autoplay
         // blocked, file failed) leaves the player paused so one tap can retry.
-        if (err.name !== 'AbortError') setPlaying(false);
+        if (err.name === 'AbortError') return;
+        setPlaying(false);
+        if (err.name === 'NotAllowedError') playOnFirstTouch(fadeMs);
       });
+    }
+
+    // Phones (and some desktop browsers) won't start sound on a page the visitor hasn't
+    // touched yet, so music they turned on earlier stops at the first page change. Start it
+    // with their first tap or key press here instead.
+    var unlockEvents = ['touchend', 'mousedown', 'keydown'];
+    var awaitingTouch = false;
+
+    function playOnFirstTouch(fadeMs) {
+      if (awaitingTouch) return;
+      awaitingTouch = true;
+      function retry(e) {
+        unlockEvents.forEach(function (type) { window.removeEventListener(type, retry, true); });
+        awaitingTouch = false;
+        // The player's own buttons start (or keep off) the music themselves
+        var own = e.target.closest && (player.contains(e.target) || e.target.closest('[data-track]'));
+        if (!own && !leaving && !wantPlaying && recall('btd-sound') === 'on') play(fadeMs);
+      }
+      unlockEvents.forEach(function (type) { window.addEventListener(type, retry, true); });
     }
 
     function pause() {
