@@ -5,6 +5,9 @@
 // (e.g. a whiteout) stores sessionStorage 'btd-arrive'. Every page reads and clears it
 // in <head> and exposes it as <html data-arrive="...">.
 (function () {
+  // The streak plays once a visit (site.js keeps this script running from page to page)
+  var streaked = false;
+
   // opts: prev, next (the arrow <a> elements; either may be null)
   //   leave(link, dir): play this page's exit ('prev' | 'next' | 'discography'); return ms to wait before going
   //   canLeave(): optional; return false to ignore navigation (e.g. before the intro starts)
@@ -77,10 +80,11 @@
     });
 
     // ---------- Hint: a streak shoots across the screen into the next arrow ----------
-    // On every page, so nobody misses it. Stops once the visitor hovers or focuses this page's next arrow,
-    // and skipped on a page they came back to with Previous: they've already found the way forward.
+    // Once a visit, on the first page that gets to play it. Skipped once the visitor hovers or
+    // focuses the next arrow, and on a page they came back to with Previous: they've already
+    // found the way forward.
     // Touch screens get a swipe instead (below), on every page; a touch stops it playing again.
-    var HINT_GAP = 12000; // play once more if they're still here this long after
+    var HINT_GAP = 12000; // the swipe plays once more if they're still here this long after
     var hintTimer;
     var noticed = !touchOnly && BTD.recall('btd-last-dir') === 'prev';
     BTD.store('btd-last-dir', ''); // only for the page it led to, not a later reload or deep link
@@ -93,18 +97,18 @@
       opts.next.addEventListener('focus', engaged);
     }
 
-    function streak(again) {
+    function streak() {
       var next = opts.next;
-      if (leaving || noticed) return;
+      if (leaving || noticed || streaked) return;
       // Don't waste it on a background tab; play it when they come back.
       if (document.hidden) {
-        document.addEventListener('visibilitychange', function () { streak(again); }, { once: true });
+        document.addEventListener('visibilitychange', streak, { once: true });
         return;
       }
       var svg = next.querySelector('svg');
       var r = svg.getBoundingClientRect();
       if (!r.width || getComputedStyle(next).visibility === 'hidden') return;
-      if (again) hintTimer = setTimeout(function () { streak(false); }, HINT_GAP);
+      streaked = true;
       // A page can set --streak on the arrow for a brighter color than the arrow itself
       var style = getComputedStyle(next);
       var color = style.getPropertyValue('--streak').trim() || style.color;

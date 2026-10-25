@@ -306,9 +306,26 @@
     .listen:hover svg,
     .listen:focus-visible svg { transform: translateX(5px); }
 
+    /* Listen: (this release elsewhere) and Follow: (the band), a row each */
+    .elsewhere {
+      display: grid;
+      gap: 12px;
+    }
+
     .social {
       display: flex;
+      align-items: center;
       gap: 18px;
+    }
+
+    .social-label {
+      min-width: 6.4em; /* lines up the two rows of icons */
+      font-family: var(--stencil);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: var(--ink);
     }
 
     .social a {
@@ -806,20 +823,32 @@
         Listen on Bandcamp
         <svg viewBox="0 0 22 10" aria-hidden="true"><path d="M0 5h21M16 .5 21 5l-5 4.5"/></svg>
       </a>
-      <nav class="social" aria-label="Batter The Drag elsewhere">
-        <a href="https://batterthedrag.bandcamp.com/album/unfathomable-depths" target="_blank" rel="noopener" aria-label="Bandcamp">
-          <svg viewBox="0 0 682.7 682.7" aria-hidden="true"><path d="M682.6 341.3C682.6 152.8 529.8 0 341.3 0S0 152.8 0 341.3s152.8 341.3 341.3 341.3 341.3-152.7 341.3-341.3zm-240.8 96.6c-17.8 0-37-4.5-45.6-22.4h-.5v18.7h-27.5v-188L266.5 433.8h-218l101.8-187.9h246.9v69.6h.5c7.9-13.2 24.5-21.4 39.3-21.4 41.5 0 61.7 32.7 61.7 72.5 0 36.7-17.9 71.3-56.9 71.3zm68.7-70.4c0-41.1 21.7-73.3 65-73.3 30.6 0 56.6 15.8 59.4 49.3h-29c-2.3-16.6-14-25.6-30.1-25.6-15 0-36.2 8.2-36.2 49.6 0 22.7 9.7 46.7 34.9 46.7 16.8 0 28.5-11.6 31.4-31.1H635c-5.4 35.3-26.5 54.9-60.4 54.9-41.4-.1-64.1-30.4-64.1-70.5z"/><path d="M433.1 414.2c-23.4 0-37-20.6-37-48 0-29 12.5-48.3 37-48.3 24 0 36.4 23.5 36.5 48.3 0 23.7-10 48-36.5 48z"/></svg>
-        </a>
-        <a href="https://open.spotify.com/artist/7n0isdj3K0MwurrqOzG4f8" target="_blank" rel="noopener" aria-label="Spotify">
-          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M15.9 8.9C12.7 7 7.4 6.8 4.3 7.8c-.5.1-1-.1-1.2-.6-.1-.6.2-1.1.7-1.2 3.6-1.1 9.4-.8 13.1 1.4.4.2.6.8.4 1.3-.3.3-.9.4-1.4.2m-.1 2.8c-.2.4-.7.5-1 .2-2.7-1.6-6.8-2.1-9.9-1.1-.4.1-.9-.1-1-.5-.1-.4 0-.9.4-.9 3.7-1.1 8.1-.6 11.2 1.3.4.2.5.7.3 1m-1.2 2.8c-.2.3-.6.4-.9.2-2.4-1.4-5.3-1.8-8.8-.9-.3.1-.6-.1-.8-.4-.1-.4.2-.6.5-.8 3.8-.9 7.1-.5 9.7 1.1.4.1.5.4.3.8M10 0C4.5 0 0 4.5 0 10s4.5 10 10 10 10-4.5 10-10S15.5 0 10 0z"/></svg>
-        </a>
-        <a href="https://www.instagram.com/batterthedrag/" target="_blank" rel="noopener" aria-label="Instagram">
-          <svg viewBox="0 0 1146.6 1146.6" aria-hidden="true"><path d="M788.3 358.3h-95.5v95.6h95.5zM573.3 671.3c52.6 0 97.9-43 97.9-97.9 0-21.5-7.2-40.6-19.1-57.3-16.7-23.9-47.8-40.6-78.8-40.6-31.1 0-62.1 16.7-78.8 40.6-11.9 16.7-19.1 35.8-19.1 57.3 0 54.9 45.4 97.9 97.9 97.9z"/><path d="M573.3 0C256.7 0 0 256.7 0 573.3s256.7 573.3 573.3 573.3 573.3-256.7 573.3-573.3S890 0 573.3 0zm279.5 745.3c0 59.7-47.8 107.5-107.5 107.5h-344c-59.7 0-107.5-47.8-107.5-107.5v-344c0-59.7 47.8-107.5 107.5-107.5h344c59.7 0 107.5 47.8 107.5 107.5v344z"/><path d="M714.3 516c7.2 16.7 11.9 38.2 11.9 57.3 0 83.6-69.3 152.9-152.9 152.9-83.6 0-152.9-69.3-152.9-152.9 0-19.1 4.8-40.6 11.9-57.3h-83.6v229.3c0 28.7 23.9 52.6 52.6 52.6h344c28.7 0 52.6-23.9 52.6-52.6V516h-83.6z"/></svg>
-        </a>
-        <a href="https://www.facebook.com/batterthedrag" target="_blank" rel="noopener" aria-label="Facebook">
-          <svg viewBox="0 0 20 19.9" aria-hidden="true"><path d="M10 0C4.5 0 0 4.5 0 10c0 5 3.7 9.1 8.4 9.9v-7H5.9V10h2.5V7.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V10h2.8l-.4 2.9h-2.3v7c4.9-.8 8.5-5 8.4-9.9 0-5.5-4.5-10-10-10z"/></svg>
-        </a>
-      </nav>
+      <div class="elsewhere">
+        <nav class="social" aria-label="Listen to Unfathomable Depths">
+          <span class="social-label" aria-hidden="true">Listen:</span>
+          <a href="https://open.spotify.com/album/1Qma2awIQSlLMF47M9SqYr" target="_blank" rel="noopener" aria-label="Spotify">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M15.9 8.9C12.7 7 7.4 6.8 4.3 7.8c-.5.1-1-.1-1.2-.6-.1-.6.2-1.1.7-1.2 3.6-1.1 9.4-.8 13.1 1.4.4.2.6.8.4 1.3-.3.3-.9.4-1.4.2m-.1 2.8c-.2.4-.7.5-1 .2-2.7-1.6-6.8-2.1-9.9-1.1-.4.1-.9-.1-1-.5-.1-.4 0-.9.4-.9 3.7-1.1 8.1-.6 11.2 1.3.4.2.5.7.3 1m-1.2 2.8c-.2.3-.6.4-.9.2-2.4-1.4-5.3-1.8-8.8-.9-.3.1-.6-.1-.8-.4-.1-.4.2-.6.5-.8 3.8-.9 7.1-.5 9.7 1.1.4.1.5.4.3.8M10 0C4.5 0 0 4.5 0 10s4.5 10 10 10 10-4.5 10-10S15.5 0 10 0z"/></svg>
+          </a>
+          <a href="https://music.youtube.com/playlist?list=OLAK5uy_mGqLL_6rwwA6g9IZ6JcOZ6NS3ggMHw9d8" target="_blank" rel="noopener" aria-label="YouTube Music">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M10 0a10 10 0 1 0 0 20a10 10 0 1 0 0-20zM10 3.5a6.5 6.5 0 1 0 0 13a6.5 6.5 0 1 0 0-13zM10 4.6a5.4 5.4 0 1 0 0 10.8a5.4 5.4 0 1 0 0-10.8zM8.3 7.1v5.8l5-2.9z"/></svg>
+          </a>
+          <a href="https://music.apple.com/us/album/unfathomable-depths-ep/1548087999" target="_blank" rel="noopener" aria-label="Apple Music">
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M10 0a10 10 0 1 0 0 20a10 10 0 1 0 0-20zM8.2 5.9 14.6 4.5v8a2 1.55 0 1 1-1.2-1.2V7.2l-4 .9v5.6a2 1.55 0 1 1-1.2-1.2z"/></svg>
+          </a>
+        </nav>
+        <nav class="social" aria-label="Follow Batter The Drag">
+          <span class="social-label" aria-hidden="true">Follow:</span>
+          <a href="https://www.instagram.com/batterthedrag/" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg viewBox="0 0 1146.6 1146.6" aria-hidden="true"><path d="M788.3 358.3h-95.5v95.6h95.5zM573.3 671.3c52.6 0 97.9-43 97.9-97.9 0-21.5-7.2-40.6-19.1-57.3-16.7-23.9-47.8-40.6-78.8-40.6-31.1 0-62.1 16.7-78.8 40.6-11.9 16.7-19.1 35.8-19.1 57.3 0 54.9 45.4 97.9 97.9 97.9z"/><path d="M573.3 0C256.7 0 0 256.7 0 573.3s256.7 573.3 573.3 573.3 573.3-256.7 573.3-573.3S890 0 573.3 0zm279.5 745.3c0 59.7-47.8 107.5-107.5 107.5h-344c-59.7 0-107.5-47.8-107.5-107.5v-344c0-59.7 47.8-107.5 107.5-107.5h344c59.7 0 107.5 47.8 107.5 107.5v344z"/><path d="M714.3 516c7.2 16.7 11.9 38.2 11.9 57.3 0 83.6-69.3 152.9-152.9 152.9-83.6 0-152.9-69.3-152.9-152.9 0-19.1 4.8-40.6 11.9-57.3h-83.6v229.3c0 28.7 23.9 52.6 52.6 52.6h344c28.7 0 52.6-23.9 52.6-52.6V516h-83.6z"/></svg>
+          </a>
+          <a href="https://www.facebook.com/batterthedrag" target="_blank" rel="noopener" aria-label="Facebook">
+            <svg viewBox="0 0 20 19.9" aria-hidden="true"><path d="M10 0C4.5 0 0 4.5 0 10c0 5 3.7 9.1 8.4 9.9v-7H5.9V10h2.5V7.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V10h2.8l-.4 2.9h-2.3v7c4.9-.8 8.5-5 8.4-9.9 0-5.5-4.5-10-10-10z"/></svg>
+          </a>
+          <a href="https://batterthedrag.bandcamp.com" target="_blank" rel="noopener" aria-label="Bandcamp">
+            <svg viewBox="0 0 682.7 682.7" aria-hidden="true"><path d="M682.6 341.3C682.6 152.8 529.8 0 341.3 0S0 152.8 0 341.3s152.8 341.3 341.3 341.3 341.3-152.7 341.3-341.3zm-240.8 96.6c-17.8 0-37-4.5-45.6-22.4h-.5v18.7h-27.5v-188L266.5 433.8h-218l101.8-187.9h246.9v69.6h.5c7.9-13.2 24.5-21.4 39.3-21.4 41.5 0 61.7 32.7 61.7 72.5 0 36.7-17.9 71.3-56.9 71.3zm68.7-70.4c0-41.1 21.7-73.3 65-73.3 30.6 0 56.6 15.8 59.4 49.3h-29c-2.3-16.6-14-25.6-30.1-25.6-15 0-36.2 8.2-36.2 49.6 0 22.7 9.7 46.7 34.9 46.7 16.8 0 28.5-11.6 31.4-31.1H635c-5.4 35.3-26.5 54.9-60.4 54.9-41.4-.1-64.1-30.4-64.1-70.5z"/><path d="M433.1 414.2c-23.4 0-37-20.6-37-48 0-29 12.5-48.3 37-48.3 24 0 36.4 23.5 36.5 48.3 0 23.7-10 48-36.5 48z"/></svg>
+          </a>
+        </nav>
+      </div>
     </div>
   </div>
 

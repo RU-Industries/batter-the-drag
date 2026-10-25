@@ -224,6 +224,7 @@
         if (!(n.nodeType === 1 && n.hasAttribute('data-persist'))) n.remove();
       });
 
+      site.from = shown;
       shown = path;
       site.swapped = true;
 
@@ -416,6 +417,9 @@
     // fn(p): the preload's progress, 0 to 1, or null until the total is known
     onProgress: function (fn) { scope.progress.push(fn); fn(progress); },
     // False on the page the visit started on (or a reload), true once a page has been swapped in
-    swapped: false
+    swapped: false,
+    // The page path the visitor was on before this one (the Discography's close goes back there);
+    // null if they came from somewhere else
+    from: document.referrer ? pathOf(document.referrer) : null
   };
 })();
