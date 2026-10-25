@@ -92,14 +92,14 @@
   .arrow[data-next] { right: 4px; }
   /* Just the icon: the words would run into the page titles */
   .discog {
-    top: calc(4px + env(safe-area-inset-top));
+    top: calc(8px + env(safe-area-inset-top));
     right: 4px;
     padding: 14px;
   }
 
   .discog svg {
-    width: 16px;
-    height: 16px;
+    width: 24px;
+    height: 24px;
   }
 
   .discog span {

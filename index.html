@@ -295,7 +295,7 @@
       filter: drop-shadow(0 0 10px rgba(239, 235, 203, .45));
     }
 
-    /* ---------- Big next arrow (placed by arrows.css) ---------- */
+    /* ---------- Big prev / next arrows (placed by arrows.css) ---------- */
 
     .arrow,
     .discog {
@@ -308,9 +308,10 @@
 
     .arrow svg {
       stroke-width: 1;
-      animation: nudge 3.2s 5s ease-in-out infinite;
       transition: filter .4s;
     }
+
+    .arrow[data-next] svg { animation: nudge 3.2s 5s ease-in-out infinite; }
 
 
     .arrow:hover,
@@ -513,6 +514,9 @@
       .info { max-width: calc(100vw - var(--gutter) * 2); }
       /* The arrow above the songs, not over them */
       :root { --arrow-top: 38%; }
+      /* It sits over the lit tunnel wall here, so it needs more light and weight to stand out */
+      .arrow { color: var(--light); }
+      .arrow svg { stroke-width: 1.6; }
       .social svg { width: 26px; height: 26px; }
       /* Smaller on phones so the line ends short of the Discography icon in the top-right corner */
       .title .band { font-size: 8vw; }
@@ -624,6 +628,8 @@
       .is-ready .info > :nth-child(4) { animation-delay: 4.2s; }
       .is-ready .arrow,
       .is-ready .discog { animation: arrow-in 1.6s 4.4s var(--ease-out) both; }
+      .is-ready .arrow[data-next] { animation-delay: 4.6s; }
+      .is-ready .discog { animation-delay: 4.8s; }
       .is-ready .player { animation: rise 1.4s 4.6s var(--ease-out) both; }
       .is-ready .title .band::after,
       .is-ready .title .album::after { animation: sheen 11s 6s ease-in-out infinite; }
@@ -696,6 +702,10 @@
     </nav>
   </div>
 
+  <a class="arrow" href="unfathomable-depths" data-prev>
+    <span class="sr-only">Previous: Unfathomable Depths</span>
+    <svg viewBox="0 0 50 100" aria-hidden="true"><path d="M48 2 2 50 48 98"/></svg>
+  </a>
   <a class="arrow" href="ensete" data-next>
     <span class="sr-only">Next: Ensete</span>
     <svg viewBox="0 0 50 100" aria-hidden="true"><path d="M2 2 48 50 2 98"/></svg>
@@ -907,6 +917,7 @@
 
       // ---------- Next page: walk into the light ----------
       var nav = BTD.nav({
+        prev: document.querySelector('[data-prev]'),
         next: document.querySelector('[data-next]'),
         canLeave: function () { return root.classList.contains('is-ready'); },
         leave: function () {

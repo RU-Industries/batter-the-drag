@@ -324,9 +324,10 @@
     .arrow,
     .discog {
       --streak: #ffea99;
+      --shadow: drop-shadow(0 0 8px rgba(0, 0, 0, .9));
       z-index: 8;
       color: var(--flame-dim);
-      filter: drop-shadow(0 0 8px rgba(0, 0, 0, .9));
+      filter: var(--shadow);
       transition: color .4s;
     }
 
@@ -511,6 +512,13 @@
       from { opacity: 0; filter: blur(8px); }
     }
 
+    /* The same for the arrows and Discography link, keeping their drop shadow. Safari can't blend
+       blur() into drop-shadow() and leaves them invisible, so both ends list the same filters. */
+    @keyframes unblur-shadowed {
+      from { opacity: 0; filter: blur(8px) var(--shadow); }
+      to   { filter: blur(0) var(--shadow); }
+    }
+
     @keyframes square-breathe {
       0%, 100% { opacity: 1; }
       50% { opacity: .72; }
@@ -584,7 +592,9 @@
       .is-lit .info > :nth-child(3) { animation-delay: 1.9s; }
       .is-lit .info > :nth-child(4) { animation-delay: 2s; }
       .is-lit .arrow,
-      .is-lit .discog { animation: unblur .8s 2s ease both; }
+      .is-lit .discog { animation: unblur-shadowed .8s 2s ease both; }
+      .is-lit .arrow[data-next] { animation-delay: 2.15s; }
+      .is-lit .discog { animation-delay: 2.3s; }
       .is-lit .player { animation: unblur .8s 2.1s ease both; }
 
       /* Burning down to black */

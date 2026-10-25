@@ -327,7 +327,7 @@
     .social a:hover svg,
     .social a:focus-visible svg { fill: var(--blue); }
 
-    /* ---------- Big prev arrow (placed by arrows.css) ---------- */
+    /* ---------- Big prev / next arrows (placed by arrows.css) ---------- */
 
     .arrow,
     .discog {
@@ -336,11 +336,15 @@
       transition: color .3s;
     }
 
+    /* Cut out of the paper, so the next arrow still reads where the record slides under it */
+    .arrow { filter: drop-shadow(0 0 2px var(--paper)) drop-shadow(0 0 5px var(--paper)); }
+
     .arrow svg {
       stroke-width: 3;
       stroke-linecap: square;
-      animation: nudge 3.2s 5s ease-in-out infinite;
     }
+
+    .arrow[data-next] svg { animation: nudge 3.2s 5s ease-in-out infinite; }
 
 
     .arrow:hover,
@@ -485,6 +489,22 @@
       background: #f4fff9;
       box-shadow: 0 0 30px 10px rgba(170, 255, 225, .75), 0 0 120px 40px rgba(120, 220, 200, .35);
       opacity: 0;
+    }
+
+    /* Arriving out of The Wendt's light: fade it off (whatever the motion setting; it's only opacity) */
+    .arrive-light {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      pointer-events: none;
+      background: #efebcb;
+      opacity: 0;
+    }
+
+    [data-arrive="light"] .arrive-light { animation: arrive-fade .8s ease-out both; }
+
+    @keyframes arrive-fade {
+      from { opacity: 1; }
     }
 
     /* Leaving: an ink blot floods the page */
@@ -633,9 +653,9 @@
 
     @keyframes nudge {
       0%, 70%, 100% { transform: translateX(0); }
-      80% { transform: translateX(-10px); }
+      80% { transform: translateX(10px); }
       90% { transform: translateX(0); }
-      95% { transform: translateX(-5px); }
+      95% { transform: translateX(5px); }
     }
 
     @keyframes misregister {
@@ -682,6 +702,8 @@
       .info > :nth-child(4) { animation-delay: 2.35s; }
       .arrow,
       .discog { animation: arrow-in 1s 2.6s var(--ease-out) both; }
+      .arrow[data-next] { animation-delay: 2.75s; }
+      .discog { animation-delay: 2.9s; }
       .player { animation: rise .8s 2.8s var(--ease-out) both; }
       .sleeve .ghost { animation: misregister 7s 4s steps(1) infinite; }
       .sleeve img:not(.ghost) { animation: jolt 7s 4s steps(1) infinite; }
@@ -795,6 +817,10 @@
     <span class="sr-only">Previous: The Big Sleep</span>
     <svg viewBox="0 0 50 100" aria-hidden="true"><path d="M48 2 2 50 48 98"/></svg>
   </a>
+  <a class="arrow" href="./" data-next>
+    <span class="sr-only">Next: The Wendt</span>
+    <svg viewBox="0 0 50 100" aria-hidden="true"><path d="M2 2 48 50 2 98"/></svg>
+  </a>
   <a class="discog" href="discography" data-discography>
     <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 1h6v6H1zM9 1h6v6H9zM1 9h6v6H1zM9 9h6v6H9z"/></svg>
     <span>Discography</span>
@@ -816,6 +842,7 @@
   <div class="scan" aria-hidden="true"></div>
   <div class="scan-bar" aria-hidden="true"></div>
   <svg class="exit-ink" viewBox="0 0 100 100" aria-hidden="true"><path/></svg>
+  <div class="arrive-light" aria-hidden="true"></div>
 
   <script src="player.js"></script>
   <script src="nav.js"></script>
@@ -955,8 +982,8 @@
 
       // Keep ink off the words and controls.
       function blockers() {
-        return ['.masthead', '.info', '.player', '.arrow', '.discog'].map(function (q) {
-          return document.querySelector(q).getBoundingClientRect();
+        return Array.prototype.map.call(document.querySelectorAll('.masthead, .info, .player, .arrow, .discog'), function (el) {
+          return el.getBoundingClientRect();
         }).filter(function (r) { return r.width > 1; });
       }
 
@@ -1059,7 +1086,7 @@
         document.querySelector('.player-toggle').click();
       });
 
-      // ---------- Back to The Big Sleep: an ink blot floods the page ----------
+      // ---------- Leaving: an ink blot floods the page from the link ----------
       var exitInk = document.querySelector('.exit-ink');
       var d = '';
       traceBlob(blobPoints(14, .3), 50, 50, 46,
@@ -1068,9 +1095,9 @@
       exitInk.querySelector('path').setAttribute('d', d + 'Z');
 
       var exitSplats = [];
-      BTD.nav({
+      var nav = BTD.nav({
         prev: document.querySelector('[data-prev]'),
-        next: null,
+        next: document.querySelector('[data-next]'),
         leave: function (link) {
           music.leave(900);
           var r = link.getBoundingClientRect();
@@ -1096,6 +1123,7 @@
           music.restore(2000);
         }
       });
+      nav.hint(); // the arrows' entrance is plain CSS, already running
 
       // ---------- Start ----------
       sizeCanvas();
