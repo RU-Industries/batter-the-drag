@@ -139,7 +139,7 @@
       ], { duration: 1300, delay: 800, easing: 'ease-in-out', composite: 'add' });
     }
 
-    // A fingertip swipes across where the arrows would be, in the page's own cursor effect
+    // A hand swipes across where the arrows would be, its fingertip in the page's own cursor effect
     // (cursor.js), with the word in the page's own lettering and arrow color
     function swipe(again) {
       if (leaving || (!again && touched)) return;

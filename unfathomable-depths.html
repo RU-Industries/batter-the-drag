@@ -355,15 +355,13 @@
     .arrow:hover svg,
     .arrow:focus-visible svg { animation-play-state: paused; }
 
-    /* The swipe hint on touch screens (nav.js): stenciled, cut out of the paper like the arrows,
-       and above the fingertip so it stays off the songs */
+    /* The swipe hint on touch screens (nav.js): stenciled, on a scrap of the paper */
     .swipe-hint {
-      --swipe-word: -50px;
-      --swipe-halo: 0 0 3px var(--paper), 0 0 8px var(--paper), 0 0 14px var(--paper);
+      --swipe-bg: rgba(246, 245, 240, .78);
+      --swipe-track: .3em;
       font-family: var(--stencil);
       font-weight: 700;
       font-size: 18px;
-      letter-spacing: .3em;
     }
 
     /* ---------- Player: a strip of black tape ---------- */

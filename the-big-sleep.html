@@ -401,12 +401,12 @@
     .arrow[data-next]:hover svg,
     .arrow[data-next]:focus-visible svg { transform: translateX(8px); }
 
-    /* The swipe hint on touch screens (nav.js): the title's red italic, lifted off the painting by the paper */
+    /* The swipe hint on touch screens (nav.js): the title's red italic, on a scrap of the painting's paper */
     .swipe-hint {
-      --swipe-halo: 0 0 4px var(--paper), 0 0 10px var(--paper), 0 0 18px var(--paper);
+      --swipe-bg: rgba(231, 231, 228, .78);
+      --swipe-track: .3em;
       font-style: italic;
       font-size: 17px;
-      letter-spacing: .3em;
       text-transform: none;
     }
 

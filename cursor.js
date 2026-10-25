@@ -478,6 +478,10 @@
     }
 
     // ---------- The swipe hint: a fingertip pressing down, gliding across, lifting off ----------
+    // A pointing hand, its fingertip at 0,0 (about 43 by 50 px)
+    var HAND = new Path2D('M-5 5A5 5 0 0 1 5 5L5 18A4.6 4.6 0 0 1 14 19A4.3 4.3 0 0 1 22 22' +
+      'A4 4 0 0 1 29 25.5L29 34C29 44 23 50 14 50L6 50C1 50-2 48-5 45L-14 34A3.6 3.6 0 0 1-9 29L-5 32Z');
+    var CREASES = new Path2D('M5 18L5 26M14 19L14 27M22 22L22 28');
     // It trails the page's own effect, like a real finger would.
     function fingertip(now) {
       var k = (now - demo.start) / demo.ms;
@@ -507,6 +511,23 @@
       ctx.arc(fx, fy, r, 0, Math.PI * 2);
       ctx.fill();
       ctx.stroke();
+      // and the hand it belongs to, pointing up into the ring, pressing in and lifting off
+      ctx.save();
+      ctx.translate(fx, fy + 4);
+      ctx.rotate(-.18);
+      ctx.scale(1.12 - .12 * press + .1 * lift, 1.12 - .12 * press + .1 * lift);
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      ctx.fillStyle = rgba(kind.halo, .7 * a);
+      ctx.strokeStyle = rgba(kind.halo, .7 * a);
+      ctx.lineWidth = 5;
+      ctx.fill(HAND);
+      ctx.stroke(HAND);
+      ctx.strokeStyle = rgba(kind.finger, .95 * a);
+      ctx.lineWidth = 1.6;
+      ctx.stroke(HAND);
+      ctx.stroke(CREASES);
+      ctx.restore();
     }
 
     // nav.js calls this to play the hint from (fx, fy) to (tx, ty)

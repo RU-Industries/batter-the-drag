@@ -41,21 +41,25 @@
   }
 }
 
-/* The swipe hint's word by the fingertip: each page's lettering, in its arrows' color (nav.js).
-   A page can move it (--swipe-word: how far below the fingertip, negative for above) and set
-   a halo that reads over its art (--swipe-halo). */
+/* The swipe hint's word below the fingertip's hand: each page's lettering, in its arrows' color (nav.js),
+   on a frosted pill so it reads over any art. A page can move it (--swipe-word: how far from the
+   fingertip, negative for above), tint the pill (--swipe-bg) and space the letters (--swipe-track). */
 .swipe-hint {
   position: fixed;
   left: 50%;
   z-index: 30;
-  padding-left: .4em; /* balances the letter-spacing after the last letter */
+  padding: .55em 1.1em .55em calc(1.1em + var(--swipe-track, .4em)); /* balances the space after the last letter */
+  border-radius: 999px;
+  background: var(--swipe-bg, rgba(0, 0, 0, .5));
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
   font-size: 14px;
-  letter-spacing: .4em;
+  line-height: 1;
+  letter-spacing: var(--swipe-track, .4em);
   text-transform: uppercase;
   white-space: nowrap;
   pointer-events: none;
-  text-shadow: var(--swipe-halo, 0 0 6px rgba(0, 0, 0, .9), 0 0 14px rgba(0, 0, 0, .7));
-  transform: translate(-50%, calc(-50% + var(--swipe-word, 46px)));
+  transform: translate(-50%, calc(-50% + var(--swipe-word, 80px)));
 }
 
 /* Discography: top right on every page. Each page colors it like its arrows. */
