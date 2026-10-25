@@ -3,6 +3,8 @@
 // sessionStorage 'btd-sound' holds the visitor's own choice ('on' / 'off'). Only their
 // clicks change it, so a blocked autoplay or a page change never flips it.
 (function () {
+  var BTD = window.BTD || (window.BTD = {});
+
   function store(key, value) { try { sessionStorage.setItem(key, value); } catch (e) {} }
   function recall(key) { try { return sessionStorage.getItem(key); } catch (e) { return null; } }
 
@@ -14,7 +16,9 @@
     var toggle = player.querySelector('.player-toggle');
     var title = player.querySelector('.player-title');
     var trackButtons = document.querySelectorAll('[data-track]');
-    var audio = new Audio();
+    // One audio element for the whole visit: once a tap has let it play, phones let it
+    // play again on the pages site.js swaps in
+    var audio = BTD.audio || (BTD.audio = new Audio());
     audio.preload = 'none';
 
     var index = opts.start;
@@ -160,7 +164,6 @@
     };
   }
 
-  var BTD = window.BTD || (window.BTD = {});
   BTD.store = store;
   BTD.recall = recall;
   BTD.createPlayer = createPlayer;

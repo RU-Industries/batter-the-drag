@@ -19,6 +19,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Italiana&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
   <script>document.documentElement.classList.replace('no-js', 'js');</script>
   <script>try { var a = sessionStorage.getItem('btd-arrive'); if (a) { sessionStorage.removeItem('btd-arrive'); document.documentElement.dataset.arrive = a; } } catch (e) {}</script>
+  <script src="site.js"></script>
   <script src="timing.js"></script>
   <link rel="stylesheet" href="arrows.css">
   <style>
@@ -497,6 +498,43 @@
     .gate .wave { animation: wave 2.4s ease-in-out infinite; }
     .gate .wave + .wave { animation-delay: .3s; }
 
+    /* The rest of the site loading while they choose (site.js reports it) */
+    .gate-load {
+      display: grid;
+      justify-items: center;
+      gap: 14px;
+      transition: opacity 1s .9s;
+    }
+
+    .gate-load-bar {
+      width: min(220px, 60vw);
+      height: 1px;
+      background: rgba(122, 117, 89, .35);
+    }
+
+    .gate-load-bar span {
+      display: block;
+      height: 100%;
+      background: var(--light);
+      box-shadow: 0 0 8px rgba(239, 235, 203, .6);
+      transform-origin: left;
+      transform: scaleX(var(--load, 0));
+      transition: transform .3s ease-out;
+    }
+
+    .gate-load[hidden] { display: none; }
+    .gate-load.is-done { opacity: 0; }
+
+    .gate-load-text {
+      padding-left: .42em; /* balances the letter-spacing after the last letter */
+      font-size: 11px;
+      font-weight: 400;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: .42em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+    }
+
     :focus-visible { outline: 1px solid var(--light); outline-offset: 4px; }
 
     .sr-only {
@@ -732,6 +770,10 @@
   <div class="gate" hidden>
     <div class="gate-inner">
       <p class="gate-title">Batter The Drag</p>
+      <div class="gate-load" hidden aria-hidden="true">
+        <span class="gate-load-bar"><span></span></span>
+        <span class="gate-load-text">Loading</span>
+      </div>
       <div class="gate-choices">
         <button type="button" data-sound="on">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5h3.5L11 5.5v13l-4.5-4H3z"/><path class="wave" d="M14.5 9a4.2 4.2 0 0 1 0 6"/><path class="wave" d="M17 6.5a7.8 7.8 0 0 1 0 11"/></svg>
@@ -944,11 +986,33 @@
 
       var gate = document.querySelector('.gate');
       var soundPref = recall('btd-sound');
-      if (soundPref) {
+      // A first visit or a reload asks again: phones only allow sound after a tap on this page load.
+      // Coming back here from another page of the visit, the choice still stands.
+      if (soundPref && (!BTD.site || BTD.site.swapped)) {
         ready();
         if (soundPref === 'on') music.play(2500);
       } else {
         gate.hidden = false;
+        if (BTD.site) {
+          var load = gate.querySelector('.gate-load');
+          var loadText = load.querySelector('.gate-load-text');
+          // The number counts up through every percent to the real one (null: not known yet)
+          var target = 0, shownPercent = 0, counting = 0;
+          function count() {
+            counting = 0;
+            if (shownPercent < target) shownPercent++;
+            load.style.setProperty('--load', shownPercent / 100);
+            loadText.textContent = shownPercent === 100 ? 'Ready' : 'Loading ' + shownPercent + '%';
+            load.classList.toggle('is-done', shownPercent === 100);
+            if (shownPercent < target) counting = requestAnimationFrame(count);
+          }
+          BTD.site.onProgress(function (p) {
+            if (p === 1 && load.hidden) return; // already loaded: nothing to show
+            load.hidden = false;
+            target = p === 1 ? 100 : Math.floor((p || 0) * 100);
+            if (!counting) count();
+          });
+        }
         gate.querySelectorAll('[data-sound]').forEach(function (b) {
           b.addEventListener('click', function () {
             var on = b.dataset.sound === 'on';

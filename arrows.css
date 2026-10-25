@@ -11,7 +11,8 @@
   position: fixed;
   top: 0;
   bottom: 16vh;
-  height: fit-content;
+  box-sizing: border-box;
+  height: calc(var(--arrow-w) * 2 + 32px); /* the icon and padding; Safari can't center fit-content here */
   margin: auto 0;
   display: grid;
   justify-items: center;
@@ -29,6 +30,32 @@
   fill: none;
   stroke: currentColor;
   overflow: visible;
+}
+
+/* Touch-only screens (no mouse or trackpad): swiping replaces the arrows, and nav.js shows how.
+   They stay in the page for screen readers. */
+@media (any-hover: none) {
+  .arrow {
+    opacity: 0 !important;
+    pointer-events: none;
+  }
+}
+
+/* The swipe hint's word by the fingertip: each page's lettering, in its arrows' color (nav.js).
+   A page can move it (--swipe-word: how far below the fingertip, negative for above) and set
+   a halo that reads over its art (--swipe-halo). */
+.swipe-hint {
+  position: fixed;
+  left: 50%;
+  z-index: 30;
+  padding-left: .4em; /* balances the letter-spacing after the last letter */
+  font-size: 14px;
+  letter-spacing: .4em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+  text-shadow: var(--swipe-halo, 0 0 6px rgba(0, 0, 0, .9), 0 0 14px rgba(0, 0, 0, .7));
+  transform: translate(-50%, calc(-50% + var(--swipe-word, 46px)));
 }
 
 /* Discography: top right on every page. Each page colors it like its arrows. */
@@ -85,6 +112,7 @@
   .arrow {
     top: calc(var(--arrow-top, 50%) - 50px);
     bottom: auto;
+    height: auto;
     margin: 0;
   }
 

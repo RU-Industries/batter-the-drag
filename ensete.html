@@ -19,6 +19,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <script>document.documentElement.classList.replace('no-js', 'js');</script>
   <script>try { var a = sessionStorage.getItem('btd-arrive'); if (a) { sessionStorage.removeItem('btd-arrive'); document.documentElement.dataset.arrive = a; } } catch (e) {}</script>
+  <script src="site.js"></script>
   <script src="timing.js"></script>
   <link rel="stylesheet" href="arrows.css">
   <style>
@@ -1033,8 +1034,11 @@
         tween('ignite', 1, 1700 / BTD.timing.enter, 100 / BTD.timing.enter, easeInOut);
       }
 
+      // (the photo can arrive after Back has already swapped this page out)
+      var here = BTD.site ? BTD.site.alive() : function () { return true; };
+
       function light() {
-        if (root.classList.contains('is-lit')) return;
+        if (root.classList.contains('is-lit') || !here()) return;
         if (initGL()) {
           sizeFire();
           root.classList.add('gl-ready');

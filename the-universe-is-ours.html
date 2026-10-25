@@ -7,6 +7,7 @@
   <link rel="preload" href="the-universe-is-ours.svg" as="image">
   <link rel="icon" type="image/png" href="favicon.png">
   <script>try { var a = sessionStorage.getItem('btd-arrive'); if (a) { sessionStorage.removeItem('btd-arrive'); document.documentElement.dataset.arrive = a; } } catch (e) {}</script>
+  <script src="site.js"></script>
   <script src="timing.js"></script>
   <link rel="stylesheet" href="arrows.css">
   <style>
@@ -590,6 +591,7 @@
     })();
   </script>
   <script>
+  (function () {
     const mobileConfig = {
         sizeRange: [0.8, 2.3],
         speedRange: [0.1, 0.4],
@@ -604,8 +606,10 @@
         particleCount: 200
     };
 
+    // Swapped in by site.js, the page is already loaded
     function onMount(callback) {
-        document.addEventListener('DOMContentLoaded', callback);
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', callback);
+        else callback();
     }
 
     onMount(function () {
@@ -682,6 +686,7 @@
             animate();
         }
     });
+  })();
   </script>
 </body>
 </html>

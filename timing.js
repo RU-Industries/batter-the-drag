@@ -22,6 +22,12 @@
   var BTD = window.BTD || (window.BTD = {});
   BTD.timing = speed;
 
+  // This lasts the whole visit, so it uses the originals site.js keeps (it stops each page's own)
+  var raw = BTD.raw || {
+    requestAnimationFrame: window.requestAnimationFrame.bind(window),
+    on: function (target, type, fn, opts) { target.addEventListener(type, fn, opts); }
+  };
+
   // CSS animations and (while leaving) transitions get rescaled as they appear: their
   // durations and delays for the one-off ones, only the delay before a looping one starts.
   // Pages start their entrances and exits by setting a class on <html> or <body>, so watch
@@ -53,16 +59,16 @@
     };
     var tick = function () {
       scan();
-      frame = performance.now() < watchUntil || leaving() ? requestAnimationFrame(tick) : 0;
+      frame = performance.now() < watchUntil || leaving() ? raw.requestAnimationFrame(tick) : 0;
     };
     var watch = function () {
       watchUntil = performance.now() + 12000 / Math.min(speed.enter, 1);
-      if (!frame) frame = requestAnimationFrame(tick);
+      if (!frame) frame = raw.requestAnimationFrame(tick);
     };
     watch();
     var classes = new MutationObserver(watch);
     classes.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    document.addEventListener('DOMContentLoaded', function () {
+    raw.on(document, 'DOMContentLoaded', function () {
       classes.observe(document.body, { attributes: true, attributeFilter: ['class'] });
     });
   }
@@ -79,6 +85,7 @@
   function build() {
     panel = document.createElement('div');
     panel.id = 'btd-timing';
+    panel.setAttribute('data-persist', ''); // stays when site.js swaps the page
     panel.innerHTML =
       '<style>' +
       '#btd-timing { position: fixed; left: 16px; bottom: 16px; z-index: 2147483001; width: 270px; padding: 14px 16px 12px;' +
@@ -137,7 +144,7 @@
     panel.hidden = !open;
   }
 
-  window.addEventListener('keydown', function (e) {
+  raw.on(window, 'keydown', function (e) {
     if (e.key !== 'Tab' || e.altKey || e.metaKey || e.ctrlKey || e.shiftKey) return;
     e.preventDefault();
     toggle(!panel || panel.hidden);

@@ -10,6 +10,7 @@
   <meta property="og:image" content="https://batterthedrag.com/wendt/cover.jpg">
   <link rel="icon" type="image/png" href="favicon.png">
   <script>try { var a = sessionStorage.getItem('btd-arrive'); if (a) { sessionStorage.removeItem('btd-arrive'); document.documentElement.dataset.arrive = a; } } catch (e) {}</script>
+  <script src="site.js"></script>
   <script src="timing.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -266,15 +267,36 @@
       var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       var timer;
 
-      document.querySelectorAll('.release a').forEach(function (link) {
+      var links = document.querySelectorAll('.release a');
+
+      // site.js swaps the release in; without it, an ordinary page load
+      function arrive(href) {
+        if (BTD.site) BTD.site.go(href);
+        else location.href = href;
+      }
+
+      function leave(link) {
+        if (BTD.site) BTD.site.prefetch(link.href);
+        if (reduceMotion) { arrive(link.href); return; }
+        link.parentNode.classList.add('is-chosen');
+        document.body.classList.add('is-leaving');
+        timer = setTimeout(function () { arrive(link.href); }, 900 / BTD.timing.exit);
+      }
+
+      links.forEach(function (link) {
         link.addEventListener('click', function (e) {
-          if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0 || reduceMotion) return;
-          if (document.body.classList.contains('is-leaving')) { e.preventDefault(); return; }
+          if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
           e.preventDefault();
-          link.parentNode.classList.add('is-chosen');
-          document.body.classList.add('is-leaving');
-          timer = setTimeout(function () { location.href = link.href; }, 900 / BTD.timing.exit);
+          if (!document.body.classList.contains('is-leaving')) leave(link);
         });
+      });
+
+      // The browser's Back / Forward to a release leaves the same way
+      if (BTD.site) BTD.site.onBack(function (path) {
+        var link = [].filter.call(links, function (l) { return BTD.site.pathOf(l.href) === path; })[0];
+        if (!link || document.body.classList.contains('is-leaving')) return false;
+        leave(link);
+        return true;
       });
 
       // The back button brings the page back mid-exit: undo it.

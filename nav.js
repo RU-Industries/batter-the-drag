@@ -14,25 +14,42 @@
     var leaving = false;
     var timer;
     var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // Phones and tablets: swiping replaces the arrows (arrows.css hides them there)
+    var touchOnly = window.matchMedia('(any-hover: none)').matches;
 
+    // Returns whether it's leaving
     function go(link, dir) {
-      if (!link || leaving || (opts.canLeave && !opts.canLeave())) return;
+      if (!link || leaving || (opts.canLeave && !opts.canLeave())) return false;
       leaving = true;
       BTD.store('btd-last-dir', dir);
-      if (reduceMotion) { location.href = link.href; return; }
+      if (BTD.site) BTD.site.prefetch(link.href);
+      if (reduceMotion) { arrive(link.href); return true; }
       var ms = opts.leave(link, dir) / BTD.timing.exit;
-      timer = setTimeout(function () { location.href = link.href; }, ms);
+      timer = setTimeout(function () { arrive(link.href); }, ms);
+      return true;
+    }
+
+    // site.js swaps the next page in; without it, an ordinary page load
+    function arrive(href) {
+      if (BTD.site) BTD.site.go(href);
+      else location.href = href;
     }
 
     // The Discography link (in every page's top right) leaves with the same exit
     var discog = document.querySelector('[data-discography]');
-    [[opts.prev, 'prev'], [opts.next, 'next'], [discog, 'discography']].forEach(function (pair) {
-      if (!pair[0]) return;
+    var links = [[opts.prev, 'prev'], [opts.next, 'next'], [discog, 'discography']].filter(function (pair) { return pair[0]; });
+    links.forEach(function (pair) {
       pair[0].addEventListener('click', function (e) {
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
         e.preventDefault();
         go(pair[0], pair[1]);
       });
+    });
+
+    // The browser's Back / Forward to one of those pages leaves the same way
+    if (BTD.site) BTD.site.onBack(function (path) {
+      var pair = links.filter(function (p) { return BTD.site.pathOf(p[0].href) === path; })[0];
+      return !!pair && go(pair[0], pair[1]);
     });
 
     window.addEventListener('keydown', function (e) {
@@ -62,10 +79,13 @@
     // ---------- Hint: a streak shoots across the screen into the next arrow ----------
     // On every page, so nobody misses it. Stops once the visitor hovers or focuses this page's next arrow,
     // and skipped on a page they came back to with Previous: they've already found the way forward.
+    // Touch screens get a swipe instead (below), on every page; a touch stops it playing again.
     var HINT_GAP = 12000; // play once more if they're still here this long after
     var hintTimer;
-    var noticed = BTD.recall('btd-last-dir') === 'prev';
+    var noticed = !touchOnly && BTD.recall('btd-last-dir') === 'prev';
     BTD.store('btd-last-dir', ''); // only for the page it led to, not a later reload or deep link
+    var touched = false;
+    if (touchOnly) window.addEventListener('touchstart', function () { touched = true; }, { passive: true });
 
     function engaged() { noticed = true; clearTimeout(hintTimer); }
     if (opts.next) {
@@ -119,16 +139,49 @@
       ], { duration: 1300, delay: 800, easing: 'ease-in-out', composite: 'add' });
     }
 
+    // A fingertip swipes across where the arrows would be, in the page's own cursor effect
+    // (cursor.js), with the word in the page's own lettering and arrow color
+    function swipe(again) {
+      if (leaving || (!again && touched)) return;
+      if (document.hidden) {
+        document.addEventListener('visibilitychange', function () { swipe(again); }, { once: true });
+        return;
+      }
+      if (again) hintTimer = setTimeout(function () { swipe(false); }, HINT_GAP);
+      var style = getComputedStyle(opts.next);
+      var color = style.getPropertyValue('--streak').trim() || style.color;
+      var r = opts.next.getBoundingClientRect();
+      var y = r.top + r.height / 2;
+      var w = window.innerWidth;
+
+      var word = document.createElement('div');
+      word.className = 'swipe-hint';
+      word.setAttribute('aria-hidden', 'true');
+      word.textContent = 'Swipe';
+      word.style.color = color;
+      word.style.top = y + 'px';
+      document.body.appendChild(word);
+      word.animate([
+        { opacity: 0 },
+        { opacity: 1, offset: 0.2 },
+        { opacity: 1, offset: 0.75 },
+        { opacity: 0 }
+      ], { duration: 2200, easing: 'ease' }).onfinish = function () { word.remove(); };
+
+      // (no fingertip with reduced motion: just the word)
+      if (BTD.cursor && BTD.cursor.demo) BTD.cursor.demo(w * 0.72, y, w * 0.28, y, 1700);
+    }
+
     // Waits for the arrow's own entrance animations, then gives the visitor a moment to look around.
     var hinted = false;
     function hint() {
-      if (hinted || !opts.next || reduceMotion) return;
+      if (hinted || !opts.next || (reduceMotion && !touchOnly)) return;
       hinted = true;
       var entrance = opts.next.getAnimations().filter(function (a) {
         return a.effect.getTiming().iterations !== Infinity;
       });
       Promise.all(entrance.map(function (a) { return a.finished; })).then(function () {
-        hintTimer = setTimeout(function () { streak(true); }, 1500);
+        hintTimer = setTimeout(function () { (touchOnly ? swipe : streak)(true); }, 1500);
       }, function () {}); // cancelled: the page is leaving
     }
 
