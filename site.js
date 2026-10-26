@@ -227,6 +227,7 @@
       site.from = shown;
       shown = path;
       site.swapped = true;
+      if (BTD.stats) BTD.stats.page(); // a page load would have counted it (stats.js)
 
       headScripts.forEach(function (s) { head.appendChild(inline(s)).remove(); });
       return addBody([].slice.call(doc.body.childNodes), body.firstChild).then(function () {
