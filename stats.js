@@ -40,7 +40,17 @@
   s.async = true;
   s.src = 'https://gc.zgo.at/count.js';
   s.setAttribute('data-goatcounter', 'https://batterthedrag.goatcounter.com/count');
-  s.onload = function () { queue.splice(0).forEach(count); };
+  s.onload = function () {
+    // count.js takes a window.phantom for PhantomJS (a dead headless browser) and drops the visit
+    // as a bot, but the Phantom crypto wallet extension sets it too. PhantomJS also sets callPhantom.
+    var gc = window.goatcounter, data = gc.get_data;
+    gc.get_data = function (vars) {
+      var d = data(vars);
+      if (d.b === 150 && !window.callPhantom && !window._phantom) d.b = 0;
+      return d;
+    };
+    queue.splice(0).forEach(count);
+  };
   document.head.appendChild(s);
 
   // Lasts the whole visit, so it uses the original listener site.js keeps (it stops each page's own)
