@@ -5,8 +5,10 @@
 //
 // Only on batterthedrag.com, so local and preview copies don't count. Load in <head> after site.js, with defer.
 (function () {
+  var ON = false; // off while the site is still being built and tested; true to start counting
+
   var BTD = window.BTD || (window.BTD = {});
-  var live = /(^|\.)batterthedrag\.com$/.test(location.hostname);
+  var live = ON && /(^|\.)batterthedrag\.com$/.test(location.hostname);
 
   // One name per page however it was reached: /ensete, /ensete.html, /ensete?fbclid=...
   function here() {
