@@ -194,6 +194,10 @@
       color: var(--ink);
     }
 
+    /* A dark halo, so the year and the songs still read where they cross the lit end of the tunnel */
+    .eyebrow,
+    .tracks { text-shadow: 0 0 3px rgba(0, 0, 0, .9), 0 0 12px rgba(0, 0, 0, .85); }
+
     .tracks {
       list-style: none;
       display: flex;
@@ -378,6 +382,12 @@
     .player.is-playing .player-toggle .i-play { display: none; }
     .player.is-playing .player-toggle .i-pause { display: block; }
 
+    /* Play pressed but no sound yet (loading, or the connection can't keep up): a spinner */
+    .player-toggle .i-load { display: none; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; }
+    .player.is-loading .player-toggle :is(.i-play, .i-pause) { display: none; }
+    .player.is-loading .player-toggle .i-load { display: block; animation: player-load .8s linear infinite; }
+    @keyframes player-load { to { transform: rotate(1turn); } }
+
     .player-toggle:hover,
     .player-toggle:focus-visible {
       background: var(--light);
@@ -440,6 +450,7 @@
     .player.is-playing .eq i:nth-child(2) { animation-duration: .55s; animation-delay: -.2s; }
     .player.is-playing .eq i:nth-child(3) { animation-duration: .7s; animation-delay: -.5s; }
     .player.is-playing .eq i:nth-child(4) { animation-duration: .9s; animation-delay: -.1s; }
+    .player.is-loading .eq i { animation: none; }
 
     /* ---------- Sound / no sound ---------- */
 
@@ -581,6 +592,15 @@
       .gate button { font-size: 15px; letter-spacing: .3em; }
     }
 
+    /* Short desktop screens: the title and the songs fill the left side top to bottom, leaving the
+       left arrow nowhere to go, so they move right of it (--arrow-x / --arrow-w from arrows.css) */
+    @media (min-width: 700px) and (max-height: 760px) {
+      .title,
+      .info { left: calc(var(--arrow-x) + var(--arrow-w) + 40px); }
+      /* ...and short of the player in the bottom right */
+      .info { max-width: min(440px, 100vw - var(--arrow-x) - var(--arrow-w) - 40px - var(--gutter) - 270px - 24px); }
+    }
+
     @media (max-height: 520px) {
       .tracks { display: none; }
       .info { gap: 14px; }
@@ -710,6 +730,7 @@
       .title .band::after,
       .title .album::after { display: none; }
       .bg { transform: scale(1.06); }
+      .arrow svg { animation: none; }
     }
   </style>
 </head>
@@ -730,7 +751,7 @@
   </h1>
 
   <div class="info">
-    <p class="eyebrow">The Wendt · 2026</p>
+    <p class="eyebrow">The Wendt EP · 2026</p>
     <ol class="tracks">
       <li><button type="button" data-track="0"><span>I</span>Masmusa</button></li>
       <li><button type="button" data-track="1"><span>II</span>Pangsaging</button></li>
@@ -785,6 +806,7 @@
     <button class="player-toggle" type="button" aria-label="Play">
       <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12.5-7.5z"/></svg>
       <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4.5h4v15H6zM14 4.5h4v15h-4z"/></svg>
+      <svg class="i-load" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"/></svg>
     </button>
     <div class="player-meta">
       <span class="player-title" aria-live="polite">Banane</span>
@@ -1015,8 +1037,9 @@
       var gate = document.querySelector('.gate');
       var soundPref = recall('btd-sound');
       // A first visit or a reload asks again: phones only allow sound after a tap on this page load.
-      // Coming back here from another page of the visit, the choice still stands.
-      if (soundPref && (!BTD.site || BTD.site.swapped)) {
+      // Arriving here from another page of the visit, it never asks: their choice (or the play
+      // button they didn't press) stands.
+      if ((BTD.site && BTD.site.swapped) || (soundPref && !BTD.site)) {
         ready();
         if (soundPref === 'on') music.play(2500);
       } else {
@@ -1025,19 +1048,19 @@
           var load = gate.querySelector('.gate-load');
           var loadText = load.querySelector('.gate-load-text');
           // The number counts up through every percent to the real one (null: not known yet)
-          var target = 0, shownPercent = 0, counting = 0;
+          var loaded = 0, shownPercent = 0, counting = 0;
           function count() {
             counting = 0;
-            if (shownPercent < target) shownPercent++;
+            if (shownPercent < loaded) shownPercent++;
             load.style.setProperty('--load', shownPercent / 100);
             loadText.textContent = shownPercent === 100 ? 'Ready' : 'Loading ' + shownPercent + '%';
             load.classList.toggle('is-done', shownPercent === 100);
-            if (shownPercent < target) counting = requestAnimationFrame(count);
+            if (shownPercent < loaded) counting = requestAnimationFrame(count);
           }
           BTD.site.onProgress(function (p) {
             if (p === 1 && load.hidden) return; // already loaded: nothing to show
             load.hidden = false;
-            target = p === 1 ? 100 : Math.floor((p || 0) * 100);
+            loaded = p === 1 ? 100 : Math.floor((p || 0) * 100);
             if (!counting) count();
           });
         }

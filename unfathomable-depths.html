@@ -107,6 +107,7 @@
     }
 
     body:has(.player.is-playing) .record-disc { animation-play-state: running; }
+    body:has(.player.is-loading) .record-disc { animation-play-state: paused; }
 
     .record-disc text {
       font-family: var(--stencil);
@@ -432,11 +433,25 @@
     .player.is-playing .player-toggle .i-play { display: none; }
     .player.is-playing .player-toggle .i-pause { display: block; }
 
-    .player-toggle:hover,
+    /* Play pressed but no sound yet (loading, or the connection can't keep up): a spinner */
+    .player-toggle .i-load { display: none; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; }
+    .player.is-loading .player-toggle :is(.i-play, .i-pause) { display: none; }
+    .player.is-loading .player-toggle .i-load { display: block; animation: player-load .8s linear infinite; }
+    @keyframes player-load { to { transform: rotate(1turn); } }
+
     .player-toggle:focus-visible {
       background: var(--blue);
       color: #fff;
       transform: rotate(-12deg) scale(1.06);
+    }
+
+    /* Only a real hover: a tap on a phone would leave it stuck blue, unlike tapping the record */
+    @media (hover: hover) {
+      .player-toggle:hover {
+        background: var(--blue);
+        color: #fff;
+        transform: rotate(-12deg) scale(1.06);
+      }
     }
 
     .player-toggle:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
@@ -870,6 +885,7 @@
     <button class="player-toggle" type="button" aria-label="Play">
       <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12.5-7.5z"/></svg>
       <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4.5h4v15H6zM14 4.5h4v15h-4z"/></svg>
+      <svg class="i-load" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"/></svg>
     </button>
     <div class="player-meta">
       <span class="player-title" aria-live="polite">Bezel</span>

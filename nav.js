@@ -20,9 +20,14 @@
     // Phones and tablets: swiping replaces the arrows (arrows.css hides them there)
     var touchOnly = window.matchMedia('(any-hover: none)').matches;
 
-    // Returns whether it's leaving
-    function go(link, dir) {
-      if (!link || leaving || (opts.canLeave && !opts.canLeave())) return false;
+    // Not before the arrows start to come in (hint() below): leaving earlier would play the exit
+    // over the entrance, before anything on screen says it can go
+    var entered = false;
+
+    // Returns whether it's leaving. The browser's Back has already changed the address, so it
+    // leaves with the exit even during the intro (back = true) rather than a bare swap.
+    function go(link, dir, back) {
+      if (!link || leaving || (!entered && !back) || (opts.canLeave && !opts.canLeave())) return false;
       leaving = true;
       BTD.store('btd-last-dir', dir);
       if (BTD.site) BTD.site.prefetch(link.href);
@@ -52,8 +57,31 @@
     // The browser's Back / Forward to one of those pages leaves the same way
     if (BTD.site) BTD.site.onBack(function (path) {
       var pair = links.filter(function (p) { return BTD.site.pathOf(p[0].href) === path; })[0];
-      return !!pair && go(pair[0], pair[1]);
+      return !!pair && go(pair[0], pair[1], true);
     });
+
+    // Wider screens: the arrows sit a little above the middle (arrows.css), unless the left one
+    // would land on the songs in the bottom left; then both rise just clear of them.
+    var info = document.querySelector('.info');
+    function clearInfo() {
+      var arrows = [opts.prev, opts.next].filter(Boolean);
+      arrows.forEach(function (a) { a.style.bottom = ''; });
+      var a = opts.prev;
+      if (!a || !info || window.innerWidth < 700) return;
+      if (a.offsetLeft + a.offsetWidth <= info.offsetLeft) return; // side by side, not stacked
+      var over = a.offsetTop + a.offsetHeight - (info.offsetTop - 8);
+      if (over <= 0) return;
+      // ...but no higher than just under the top band (the Discography link)
+      var top = discog ? discog.getBoundingClientRect().bottom + 12 : 0;
+      over = Math.min(over, a.offsetTop - top);
+      if (over <= 0) return;
+      // They're centered between top and bottom (margin: auto), so the bottom moves twice as far
+      var bottom = parseFloat(getComputedStyle(a).bottom) + over * 2 + 'px';
+      arrows.forEach(function (el) { el.style.bottom = bottom; });
+    }
+    clearInfo();
+    window.addEventListener('resize', clearInfo);
+    if (info) new ResizeObserver(clearInfo).observe(info);
 
     window.addEventListener('keydown', function (e) {
       if (e.altKey || e.metaKey || e.ctrlKey || e.shiftKey || e.defaultPrevented) return;
@@ -62,12 +90,14 @@
     });
 
     var touch = null;
+    // Phone held sideways: arrows.css covers the page with "Turn your phone upright"
+    var sideways = window.matchMedia('(orientation: landscape) and (max-height: 500px) and (any-hover: none)');
     // Single-finger, mostly horizontal swipes only, so pinch-zoom and scrolling never navigate.
     // Swipes from the screen edge belong to the browser's own back/forward gesture.
     window.addEventListener('touchstart', function (e) {
       var t = e.touches[0];
       var edge = t.clientX < 24 || t.clientX > window.innerWidth - 24;
-      touch = e.touches.length === 1 && !edge ? { x: t.clientX, y: t.clientY } : null;
+      touch = e.touches.length === 1 && !edge && !sideways.matches ? { x: t.clientX, y: t.clientY } : null;
     }, { passive: true });
     window.addEventListener('touchend', function (e) {
       if (touch === null || e.touches.length > 0) { touch = null; return; }
@@ -179,12 +209,25 @@
     // Waits for the arrow's own entrance animations, then gives the visitor a moment to look around.
     var hinted = false;
     function hint() {
-      if (hinted || !opts.next || (reduceMotion && !touchOnly)) return;
+      if (hinted) return;
       hinted = true;
-      var entrance = opts.next.getAnimations().filter(function (a) {
-        return a.effect.getTiming().iterations !== Infinity;
-      });
+      function entranceOf(el) {
+        return el && el.getAnimations ? el.getAnimations().filter(function (a) {
+          return a.effect.getTiming().iterations !== Infinity;
+        }) : [];
+      }
+      // How long until this arrow starts to show
+      function startsIn(anims) {
+        return Math.max.apply(null, [0].concat(anims.map(function (a) {
+          return a.effect.getComputedTiming().delay - (a.currentTime || 0);
+        })));
+      }
+      var entrance = entranceOf(opts.next);
+      // Leaving opens with whichever arrow shows first
+      var shown = [opts.prev, opts.next].filter(Boolean).map(function (el) { return startsIn(entranceOf(el)); });
+      setTimeout(function () { entered = true; }, Math.min.apply(null, shown.length ? shown : [0]));
       Promise.all(entrance.map(function (a) { return a.finished; })).then(function () {
+        if (!opts.next || (reduceMotion && !touchOnly)) return;
         hintTimer = setTimeout(function () { (touchOnly ? swipe : streak)(true); }, 1500);
       }, function () {}); // cancelled: the page is leaving
     }

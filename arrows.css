@@ -3,7 +3,7 @@
    Pages that lay out columns around the arrows use these variables too. */
 :root {
   --arrow-x: clamp(8px, 3vw, 56px);
-  --arrow-w: clamp(38px, 5vw, 70px);
+  --arrow-w: clamp(38px, min(5vw, 7.5vh), 70px); /* smaller on short screens, so they fit between the title and the songs */
 }
 
 /* Centered a little above the middle */
@@ -146,5 +146,25 @@
   .arrow svg {
     width: 34px;
     height: 68px;
+  }
+}
+
+/* Phones held sideways: too short for any of the pages (the art, the title, the songs and the
+   player can't all fit without overlapping), so they ask to be turned upright. */
+@media (orientation: landscape) and (max-height: 500px) and (any-hover: none) {
+  html::after {
+    content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 24 24' fill='none' stroke='%23e8e4da' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='7' y='2.5' width='10' height='19' rx='2'/%3E%3Cpath d='M11 18.5h2'/%3E%3C/svg%3E") "\A Turn your phone upright";
+    position: fixed;
+    inset: 0;
+    z-index: 2147483647; /* over the cursor effects (cursor.js) and the swipe hint */
+    display: grid;
+    place-content: center;
+    background: #0b0b0b;
+    color: #e8e4da;
+    font: 13px/2.6 system-ui, sans-serif;
+    letter-spacing: .3em;
+    text-transform: uppercase;
+    text-align: center;
+    white-space: pre-line;
   }
 }

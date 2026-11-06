@@ -27,6 +27,7 @@
     /* disable horz and vert window scrolling */
     body {
       overflow: hidden;
+      font-family: 'Arial', sans-serif; /* for what nav.js adds, like the swipe hint */
     }
 
     html, body {
@@ -63,12 +64,6 @@
       padding-bottom: 29%;
       position: relative;
       /* overflow: hidden; */
-    }
-
-    @media (min-width: 1200px) {
-      .logo {
-        padding-bottom: 19%;
-      }
     }
 
     .mask-container {
@@ -365,6 +360,12 @@
       display: block;
     }
 
+    /* Play pressed but no sound yet (loading, or the connection can't keep up): a spinner */
+    .player-toggle .i-load { display: none; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; }
+    .player.is-loading .player-toggle :is(.i-play, .i-pause) { display: none; }
+    .player.is-loading .player-toggle .i-load { display: block; animation: player-load .8s linear infinite; }
+    @keyframes player-load { to { transform: rotate(1turn); } }
+
     .player-meta {
       flex: 1;
       display: grid;
@@ -392,17 +393,24 @@
       transform: scaleX(var(--progress, 0));
     }
 
-    /* Short screens: lift the logo so it clears the songs in the bottom-left */
-    @media (min-width: 700px) and (max-height: 800px) {
-      body {
-        justify-content: flex-start;
-        padding-top: 5vh;
-      }
-
+    /* Wider screens: the title gets the room between the band name and the songs (measured into
+       --free-top / --free-bottom below), and stays clear of the arrows. The letters fill 90% of
+       .logo's width and are 426.4 x 135.8, so their height is .287 of it. */
+    @media (min-width: 700px) {
       .logo {
-        max-width: min(1100px, 100vh);
+        position: fixed;
+        top: calc((var(--free-top, 15vh) + var(--free-bottom, 55vh)) / 2);
+        left: 50%;
+        width: max(240px, min(1100px, (var(--free-bottom, 55vh) - var(--free-top, 15vh)) / .287, (100vw - 2 * (var(--arrow-x) + var(--arrow-w) + 32px)) / .9));
+        height: 0;
+        padding: 0;
+        transform: translateX(-50%);
       }
+    }
 
+    /* Very short windows: the songs give the title its room (they're in the player too) */
+    @media (min-width: 700px) and (max-height: 520px) {
+      .tracks { display: none; }
     }
 
     @media (max-width: 699px) {
@@ -487,6 +495,10 @@
       .is-leaving .logo { opacity: 0; transition: opacity .5s .3s; }
       .is-leaving::before,
       .is-leaving :is(.band, .info, .arrow, .discog, .player) { animation: fadeOut .45s ease-in both; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .mask-container img.universe { animation: none; }
     }
 
     @media (prefers-reduced-motion: no-preference) and (min-width: 1024px) {
@@ -577,6 +589,7 @@
     <button class="player-toggle" type="button" aria-label="Play">
       <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12.5-7.5z"/></svg>
       <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4.5h4v15H6zM14 4.5h4v15h-4z"/></svg>
+      <svg class="i-load" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"/></svg>
     </button>
     <div class="player-meta">
       <span class="player-title" aria-live="polite">Human Adjacent</span>
@@ -601,6 +614,18 @@
         start: 3, // Human Adjacent
         resumeKey: 'btd-universe'
       });
+
+      // The title's room on wider screens (CSS above): below the band name, above the songs
+      var logo = document.querySelector('.logo');
+      var band = document.querySelector('.band');
+      var info = document.querySelector('.info');
+      function room() {
+        logo.style.setProperty('--free-top', band.getBoundingClientRect().bottom + 24 + 'px');
+        logo.style.setProperty('--free-bottom', info.getBoundingClientRect().top - 24 + 'px');
+      }
+      room();
+      window.addEventListener('resize', room);
+      new ResizeObserver(room).observe(info);
 
       // Music was on on the page before: fade Human Adjacent in with the page.
       if (BTD.recall('btd-sound') === 'on') music.play(3000);

@@ -46,6 +46,13 @@
       wantPlaying = on;
       player.classList.toggle('is-playing', on);
       toggle.setAttribute('aria-label', on ? 'Pause' : 'Play');
+      if (!on) setLoading(false);
+    }
+
+    // Wanted but not sounding yet: from pressing play until the audio actually starts, and
+    // whenever it runs out of data mid-song. The page shows a spinner instead of the pause icon.
+    function setLoading(on) {
+      player.classList.toggle('is-loading', on);
     }
 
     function loadTrack(i, time) {
@@ -61,8 +68,11 @@
 
     function play(fadeMs) {
       setPlaying(true);
+      setLoading(true);
       audio.volume = 0;
       audio.play().then(function () {
+        // Resolves once it's actually playing (also when it already was, so no 'playing' event)
+        setLoading(false);
         // Pause or a page change may have happened while the file was still buffering.
         if (wantPlaying && !leaving) fadeTo(1, fadeMs);
       }, function (err) {
@@ -140,6 +150,9 @@
     });
 
     audio.addEventListener('error', function () { setPlaying(false); });
+
+    audio.addEventListener('waiting', function () { if (wantPlaying) setLoading(true); });
+    audio.addEventListener('playing', function () { setLoading(false); });
 
     window.addEventListener('pagehide', savePosition);
 

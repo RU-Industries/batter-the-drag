@@ -402,6 +402,12 @@
     .player.is-playing .player-toggle .i-play { display: none; }
     .player.is-playing .player-toggle .i-pause { display: block; }
 
+    /* Play pressed but no sound yet (loading, or the connection can't keep up): a spinner */
+    .player-toggle .i-load { display: none; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; }
+    .player.is-loading .player-toggle :is(.i-play, .i-pause) { display: none; }
+    .player.is-loading .player-toggle .i-load { display: block; animation: player-load .8s linear infinite; }
+    @keyframes player-load { to { transform: rotate(1turn); } }
+
     .player-toggle:hover,
     .player-toggle:focus-visible {
       background: var(--flame);
@@ -464,6 +470,7 @@
     .player.is-playing .eq i:nth-child(2) { animation-duration: .55s; animation-delay: -.2s; }
     .player.is-playing .eq i:nth-child(3) { animation-duration: .7s; animation-delay: -.5s; }
     .player.is-playing .eq i:nth-child(4) { animation-duration: .9s; animation-delay: -.1s; }
+    .player.is-loading .eq i { animation: none; }
 
     :focus-visible { outline: 1px solid var(--flame); outline-offset: 4px; }
 
@@ -708,6 +715,7 @@
     <button class="player-toggle" type="button" aria-label="Play">
       <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12.5-7.5z"/></svg>
       <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4.5h4v15H6zM14 4.5h4v15h-4z"/></svg>
+      <svg class="i-load" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"/></svg>
     </button>
     <div class="player-meta">
       <span class="player-title" aria-live="polite">Ensete</span>
@@ -738,6 +746,24 @@
           el.appendChild(span);
         });
       });
+
+      // Wider screens: the title (and the square with it) sits in the middle unless that would put
+      // it over the songs in the bottom left; then it rises clear of them, but not into the top band.
+      var album = document.querySelector('.title .album');
+      var topband = document.querySelector('.topband');
+      var info = document.querySelector('.info');
+      function placeTitle() {
+        root.style.removeProperty('--cy');
+        if (window.innerWidth < 700) return;
+        var half = album.offsetHeight / 2;
+        var lowest = info.offsetTop - 20 - half;
+        if (lowest < window.innerHeight / 2) {
+          root.style.setProperty('--cy', Math.max(lowest, topband.offsetHeight + 12 + half) + 'px');
+        }
+      }
+      placeTitle();
+      window.addEventListener('resize', placeTitle);
+      new ResizeObserver(placeTitle).observe(info); // its webfont arriving makes it taller
 
       // ---------- Sound ----------
       var music = BTD.createPlayer({
