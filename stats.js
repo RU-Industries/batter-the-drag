@@ -5,7 +5,7 @@
 //
 // Only on batterthedrag.com, so local and preview copies don't count. Load in <head> after site.js, with defer.
 (function () {
-  var ON = false; // off while the site is still being built and tested; true to start counting
+  var ON = true; // false stops counting (it was off while the site was built and tested)
 
   var BTD = window.BTD || (window.BTD = {});
   var live = ON && /(^|\.)batterthedrag\.com$/.test(location.hostname);
