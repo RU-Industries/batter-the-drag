@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<!-- Link-preview card for the home page (The Wendt). 1200x630, the size Facebook, X, iMessage, Slack and Discord show wide.
+     Rebuild: see _social/README.md -->
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Jost:wght@400&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; background: #000; }
+  .card {
+    position: relative; width: 1200px; height: 630px;
+    background: #000 url(../wendt/tunnel.webp) no-repeat;
+    /* 2000x946 art scaled to the card's height; the figure and the light sit right of centre */
+    background-size: auto 700px;
+    background-position: 22% 72%;
+  }
+  /* darken the top-left so the lettering reads at thumbnail size */
+  .card::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(120% 90% at 0% 0%, rgba(0,0,0,.85) 30%, transparent 65%);
+  }
+  .title {
+    position: absolute; top: 58px; left: 64px;
+    font-family: 'Italiana', serif; text-transform: uppercase; line-height: .95; color: #a8a17f;
+  }
+  .band { display: block; font-size: 104px; letter-spacing: -.01em; }
+  .album { display: block; font-size: 60px; margin-top: .22em; }
+  .meta {
+    position: absolute; left: 68px; bottom: 54px;
+    font-family: 'Jost', sans-serif; font-size: 24px; letter-spacing: .28em; text-transform: uppercase; color: #8f8a6c;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1 class="title"><span class="band">Batter The Drag</span><span class="album">The Wendt</span></h1>
+    <p class="meta">EP · 2026</p>
+  </div>
+</body>
+</html>
