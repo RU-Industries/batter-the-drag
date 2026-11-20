@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<!-- Link-preview card built from a square cover: the whole cover in the middle of a 1200x630 card, on a backdrop from
+     that release's page. Pick the release with the hash, e.g. cover-card.html#ensete. Rebuild: see _social/README.md -->
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; background: #000; }
+  .card { position: relative; width: 1200px; height: 630px; overflow: hidden; }
+  .back { position: absolute; inset: 0; }
+  .cover { position: absolute; top: 45px; left: 330px; width: 540px; height: 540px; background: var(--img) center / cover; }
+
+  /* Ensete: the page's fire, dimmed, with the cover held in front of it */
+  .ensete .back { background: url(../ensete/fire.webp) center 40% / 1300px auto; filter: brightness(.35) blur(3px); inset: -10px; }
+  .ensete .cover { box-shadow: 0 18px 60px rgba(0,0,0,.85), 0 0 0 1px rgba(255,234,153,.12); }
+
+  /* The Big Sleep: the painting laid on the page's paper */
+  .the-big-sleep .back { background: #d9d9d4 url(../the-big-sleep/paper.webp) 0 0 / 420px auto repeat; }
+  .the-big-sleep .cover { box-shadow: 0 10px 40px rgba(60,50,30,.35), 0 2px 6px rgba(60,50,30,.25); }
+
+  /* Unfathomable Depths: the photocopy on dark ink, a splash of the cover's blue */
+  .unfathomable-depths .back { background: radial-gradient(60% 80% at 50% 40%, #23292c, #111 75%); }
+  .unfathomable-depths .cover { box-shadow: 0 14px 50px rgba(0,0,0,.8), 0 0 80px rgba(47,134,180,.18); }
+
+  /* The Universe Is Ours: the cover's own scratched black runs out to the edges */
+  .the-universe-is-ours .back { background: url(../bg-2.webp) center / cover; }
+  .the-universe-is-ours .cover { top: 0; left: 285px; width: 630px; height: 630px;
+    -webkit-mask-image: radial-gradient(closest-side, #000 75%, transparent 100%);
+    mask-image: radial-gradient(closest-side, #000 75%, transparent 100%); }
+</style>
+</head>
+<body>
+  <div class="card"><div class="back"></div><div class="cover"></div></div>
+  <script>
+    var covers = {
+      'ensete': '../ensete/cover.jpg',
+      'the-big-sleep': '../the-big-sleep/cover.jpg',
+      'unfathomable-depths': '../unfathomable-depths/cover-restored.jpg',
+      'the-universe-is-ours': '../the-universe-is-ours/cover.jpg'
+    };
+    var name = location.hash.slice(1), card = document.querySelector('.card');
+    card.classList.add(name);
+    card.style.setProperty('--img', 'url(' + covers[name] + ')');
+  </script>
+</body>
+</html>
