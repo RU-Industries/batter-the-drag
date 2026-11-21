@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<!-- Link-preview card for the Discography: the band mark over all five covers. 1200x630. Rebuild: see _social/README.md -->
+<html>
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; background: #0c0c0e; }
+  .card {
+    width: 1200px; height: 630px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: radial-gradient(70% 60% at 50% 30%, #1a1a1e, #0c0c0e 70%);
+  }
+  .band {
+    width: 300px; aspect-ratio: 426.4 / 180.4; background: #ecebe6;
+    -webkit-mask: url(../batter-the-drag.svg) no-repeat center / contain; mask: url(../batter-the-drag.svg) no-repeat center / contain;
+  }
+  h2 {
+    margin-top: 26px; padding-left: .4em;
+    font: 400 22px 'Archivo', sans-serif; letter-spacing: .4em; text-transform: uppercase; color: #8d8b85;
+  }
+  .covers { display: flex; gap: 16px; margin-top: 52px; }
+  .covers > * { width: 208px; height: 208px; background-size: cover; background-position: center; position: relative;
+    box-shadow: 0 12px 30px rgba(0,0,0,.6); }
+  .universe { background-image: url(../bg-2.webp); }
+  .universe::before { content: ''; position: absolute; inset: 8%; background: url(../text-bg-2.webp) center / 160%;
+    -webkit-mask: url(../the-universe-is-ours.svg) no-repeat center / contain; mask: url(../the-universe-is-ours.svg) no-repeat center / contain; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="band"></div>
+    <h2>Discography</h2>
+    <div class="covers">
+      <div style="background-image: url(../wendt/cover-sm.webp)"></div>
+      <div style="background-image: url(../ensete/cover-sm.webp)"></div>
+      <div class="universe"></div>
+      <div style="background-image: url(../the-big-sleep/cover-sm.webp)"></div>
+      <div style="background-image: url(../unfathomable-depths/cover-sm.webp)"></div>
+    </div>
+  </div>
+</body>
+</html>

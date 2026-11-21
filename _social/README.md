@@ -3,6 +3,7 @@
 Source pages for the 1200x630 share images (`<release>/share.jpg`). GitHub Pages skips `_` folders, so these aren't published.
 
 - `wendt-card.html`: the home page (The Wendt), built from the wide tunnel art.
+- `discography-card.html`: the Discography (`discography-share.jpg` at the repo root), the band mark over all five covers.
 - `cover-card.html#<release>`: the other releases, the whole square cover on a backdrop from its page
   (`ensete`, `the-big-sleep`, `unfathomable-depths`, `the-universe-is-ours`).
 
