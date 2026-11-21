@@ -1,0 +1,4 @@
+# GitHub Pages: keep repo-only files off the site (folders starting with _ are skipped already)
+exclude:
+  - CLAUDE.md
+  - serve.py
